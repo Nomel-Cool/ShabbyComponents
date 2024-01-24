@@ -14,7 +14,7 @@
 #include "../ShabbyEventsQueue/EventsQueue.h"
 
 /// <summary>
-/// 继承QuestType
+/// 继承QuestType的用于线程池调用的事件节点类，用于记录节点保存到线程池
 /// </summary>
 class QuestNode : public QuestType
 {
@@ -23,6 +23,15 @@ public:
 	bool isUsing;
 	bool isTerminated;
     QuestType* quest_node;
+};
+
+/// <summary>
+/// 继承QuestType的用于线程池使用的线程节点，用于保存线程的状态
+/// </summary>
+class ThreadNode : public QuestType
+{
+    bool isOccupied;
+    std::thread t;
 };
 
 /// <summary>
@@ -70,9 +79,14 @@ public:
         QuestList.AddQuestToQueue(p_node);  
     }
 
+    void ConsumeQuestFromPool()
+    {
+
+    }
+
 private:
     EventsQueue QuestList;
-
+    EventsQueue ThreadList;
 
     ShabbyThreadPool() { /*...*/ }
     ~ShabbyThreadPool() { /*...*/ }
