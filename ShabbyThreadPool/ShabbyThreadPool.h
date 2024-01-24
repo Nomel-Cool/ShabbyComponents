@@ -27,7 +27,6 @@ public:
 	bool isTerminated;
 private:
 	QuestType* quest_node;
-
 };
 
 /// <summary>
