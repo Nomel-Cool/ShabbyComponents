@@ -10,6 +10,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyThreadPool", "ShabbyT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyUniversalType", "..\ShabbyUniversalType\ShabbyUniversalType.vcxproj", "{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyEventsQueue", "..\ShabbyEventsQueue\ShabbyEventsQueue.vcxproj", "{A976FCAD-67C0-4467-835F-0DD192DE2663}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA} = {BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +39,14 @@ Global
 		{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}.Release|x64.Build.0 = Release|x64
 		{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}.Release|x86.ActiveCfg = Release|Win32
 		{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}.Release|x86.Build.0 = Release|Win32
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Debug|x64.ActiveCfg = Debug|x64
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Debug|x64.Build.0 = Debug|x64
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Debug|x86.ActiveCfg = Debug|Win32
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Debug|x86.Build.0 = Debug|Win32
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Release|x64.ActiveCfg = Release|x64
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Release|x64.Build.0 = Release|x64
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Release|x86.ActiveCfg = Release|Win32
+		{A976FCAD-67C0-4467-835F-0DD192DE2663}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
