@@ -107,6 +107,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableModules>true</EnableModules>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ShabbyUniversalType;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="QuestType.h" />
     <ClInclude Include="ShabbyThreadPool.h" />
   </ItemGroup>
   <ItemGroup>

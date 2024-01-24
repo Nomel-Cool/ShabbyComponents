@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 
-#include "QuestType.h"
+#include "../ShabbyUniversalType/QuestType.h"
 
 class QuestNode
 {
