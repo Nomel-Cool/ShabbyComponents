@@ -5,6 +5,7 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyThreadPool", "ShabbyThreadPool.vcxproj", "{5ED78503-3825-473E-A7EE-B03D98693986}"
 	ProjectSection(ProjectDependencies) = postProject
+		{A976FCAD-67C0-4467-835F-0DD192DE2663} = {A976FCAD-67C0-4467-835F-0DD192DE2663}
 		{BD5EB1CB-EBB7-4B58-B60F-826A90C005AA} = {BD5EB1CB-EBB7-4B58-B60F-826A90C005AA}
 	EndProjectSection
 EndProject

@@ -6,27 +6,23 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <vector>
+#include <mutex>
+#include <atomic>
 
 #include "../ShabbyUniversalType/QuestType.h"
+#include "../ShabbyEventsQueue/EventsQueue.h"
 
-class QuestNode
+/// <summary>
+/// 继承QuestType
+/// </summary>
+class QuestNode : public QuestType
 {
 public:
-	QuestNode():isUsing(false),isTerminated(false)
-	{
-		quest_node = new QuestType();
-	}
-
-	QuestType* GetInstance()
-	{
-		if (quest_node != nullptr)
-			return quest_node;
-		return nullptr;
-	}
+	QuestNode():isUsing(false),isTerminated(false),quest_node(nullptr){}
 	bool isUsing;
 	bool isTerminated;
-private:
-	QuestType* quest_node;
+    QuestType* quest_node;
 };
 
 /// <summary>
@@ -37,31 +33,58 @@ private:
 /// 操作：
 /// 任务以队列方式与线程元关联后被消费
 /// 线程元被任务消费过程中需要加锁，同时任务完成前也需要加锁
+/// 支持任务滞后操作（当任务没有在规定条件下被执行，将被滞后或取消）
 /// 
 /// </summary>
 class ShabbyThreadPool
 {
 public:
-	ShabbyThreadPool()
-	{
-		node = new QuestNode();
-	}
-	~ShabbyThreadPool()
-	{
+    static ShabbyThreadPool* GetPoolInstance()
+    {
+        /*
+         * std::memory_order_acquire这个内存顺序标记。
+         * 这个标记的含义是：在这个加载操作之后的所有读操作和写操作都不能被重新排序到这个加载操作之前12。
+         * 换句话说，这个加载操作之后的所有操作（在当前线程中）都会看到这个加载操作的结果12。
+        */
+        ShabbyThreadPool* tmp = instance.load(std::memory_order_acquire);
+        if (!tmp) {
+            std::lock_guard<std::mutex> lock(mutex);
+            tmp = instance.load(std::memory_order_relaxed);
+            if (!tmp) {
+                tmp = new ShabbyThreadPool;
+                instance.store(tmp, std::memory_order_release);
+            }
+        }
+        return tmp;
+    }
 
-	}
-	QuestNode* GetInstance()
-	{
-		if (node != nullptr)
-			return node;
-		return nullptr;
-	}
-	bool AddQuestWithThread()
-	{
+    /// <summary>
+    /// 将一个任务节点初始化它的特征后放入池中
+    /// </summary>
+    /// <param name="quest"></param>
+    void AddQuestToPool(QuestType quest)
+    {
+        QuestNode *p_node = new QuestNode();
+        p_node->quest_node = new QuestType();
+        *p_node->quest_node = quest;
+        QuestList.AddQuestToQueue(p_node);  
+    }
 
-	}
 private:
-	QuestNode *node;
+    EventsQueue QuestList;
+
+
+    ShabbyThreadPool() { /*...*/ }
+    ~ShabbyThreadPool() { /*...*/ }
+    ShabbyThreadPool(const ShabbyThreadPool&) = delete;
+    ShabbyThreadPool& operator=(const ShabbyThreadPool&) = delete;
+
+    static std::atomic<ShabbyThreadPool*> instance;
+    static std::mutex mutex;
 };
+
+// 在类外初始化静态成员
+std::atomic<ShabbyThreadPool*> ShabbyThreadPool::instance;
+std::mutex ShabbyThreadPool::mutex;
 
 #endif // !SHABBY_THREAD_POOL_H
