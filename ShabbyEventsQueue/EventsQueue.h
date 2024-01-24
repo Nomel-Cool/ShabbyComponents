@@ -24,23 +24,38 @@ public:
 	{
 
 	}
-	void AddQuestToQueue(const QuestType* enlisted_node)
-	{
 
+	/// <summary>
+	/// 将一个事件常量入队
+	/// </summary>
+	/// <param name="enlisted_node">事件常量指针</param>
+	void AddQuestToQueue(QuestType* enlisted_node)
+	{
+		std::lock_guard<std::mutex> lock(mutex_);
 		inner_queue.push(*enlisted_node);
+		// 当有消息入队以后，尝试唤醒阻塞的获取操作，核心是消费者和生产者由Queue的size=0这个点分隔
+		cond_.notify_all();
 	}
+
+	/// <summary>
+	/// 获取队列头部事件
+	/// </summary>
+	/// <returns>返回头部事件的指针</returns>
 	QuestType* GetQuestFromQueue()
 	{
-		if (!inner_queue.empty())
-		{
-			auto consumed_node = inner_queue.front();
-			inner_queue.pop();
-			return new QuestType(consumed_node);
-		}
-		return nullptr;
+		// 获取锁
+		std::unique_lock<std::mutex> lock(mutex_);
+		// 队列为空，那么当前获取操作将阻塞，当有消息入队后就被唤醒
+		while (inner_queue.empty())
+			cond_.wait(lock);
+		auto consumed_node = inner_queue.front();
+		inner_queue.pop();
+		return new QuestType(consumed_node);
 	}
 private:
 	std::queue<QuestType> inner_queue;
+	std::mutex mutex_;
+	std::condition_variable cond_;
 };
 
 #endif // !EVENT_QUEUE_H
