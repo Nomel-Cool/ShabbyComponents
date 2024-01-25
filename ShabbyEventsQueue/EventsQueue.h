@@ -27,7 +27,7 @@ public:
 
 	bool Empty()
 	{
-		std::lock_guard(mutex_);
+		std::lock_guard<std::mutex> lock(mutex_);
 		return inner_queue.empty();
 	}
 
