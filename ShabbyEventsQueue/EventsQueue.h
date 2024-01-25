@@ -25,6 +25,12 @@ public:
 
 	}
 
+	bool Empty()
+	{
+		std::lock_guard(mutex_);
+		return inner_queue.empty();
+	}
+
 	/// <summary>
 	/// 将一个事件常量入队
 	/// </summary>
