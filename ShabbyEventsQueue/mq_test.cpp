@@ -2,7 +2,7 @@
 #include <thread>
 
 
-EventsQueue eq;
+EventsQueue<QuestType> eq;
 
 void AddQ()
 {

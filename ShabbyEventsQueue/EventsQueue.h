@@ -10,9 +10,10 @@
 
 /// <summary>
 /// 设计：
-/// 使用QuestType作为通用事件的队列，任何事态都视为函数
+/// 使用T作为通用事件的队列，任何事态都视为函数
 /// 
 /// </summary>
+template<typename T>
 class EventsQueue
 {
 public:
@@ -35,7 +36,7 @@ public:
 	/// 将一个事件常量入队
 	/// </summary>
 	/// <param name="enlisted_node">事件常量指针</param>
-	void AddQuestToQueue(QuestType* enlisted_node)
+	void AddQuestToQueue(T* enlisted_node)
 	{
 		std::lock_guard<std::mutex> lock(mutex_);
 		inner_queue.push(*enlisted_node);
@@ -47,7 +48,7 @@ public:
 	/// 获取队列头部事件
 	/// </summary>
 	/// <returns>返回头部事件的指针</returns>
-	QuestType* GetQuestFromQueue()
+	T* GetQuestFromQueue()
 	{
 		// 获取锁
 		std::unique_lock<std::mutex> lock(mutex_);
@@ -56,10 +57,10 @@ public:
 			cond_.wait(lock);
 		auto consumed_node = inner_queue.front();
 		inner_queue.pop();
-		return new QuestType(consumed_node);
+		return new T(consumed_node);
 	}
 private:
-	std::queue<QuestType> inner_queue;
+	std::queue<T> inner_queue;
 	std::mutex mutex_;
 	std::condition_variable cond_;
 };
