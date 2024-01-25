@@ -22,12 +22,32 @@ class QuestType
 {
 public:
     /// <summary>
+    /// （重载版本）利用auto把模板参数的填写解耦
+    /// </summary>
+    /// <param name="func_id">函子标签id/param>
+    /// <returns>可调用函数</returns>
+    auto GetFunctor(std::string func_id)
+    {
+        try
+        {
+            return quest_type[func_id];
+        }
+        catch (std::bad_any_cast& ex)
+        {
+            // 处理异常
+            throw ex;
+        }
+    }
+
+    /// <summary>
     /// 通过函子名称获取封装的函数表达式
     /// (TODO)应当使用枚举体加映射获取函子ID，这样做的好处是可以哈希保证唯一性
     /// 这里的转换并不安全，前提是你必须清楚函子ID对应的函数结构，否则就会抛出异常
     /// </summary>
-    /// <param name="func_id">函子字符串名称</param>
-    /// <returns></returns>
+    /// <typeparam name="RETURN_TYPE">模板参数: 返回值类型</typeparam>
+    /// <typeparam name="...ARGS_TYPE">模板参数: 形参类型</typeparam>
+    /// <param name="func_id">函子标签id</param>
+    /// <returns>可调用函数</returns>
     template<typename RETURN_TYPE, typename... ARGS_TYPE>
     std::function<RETURN_TYPE(ARGS_TYPE...)> GetFunctor(std::string func_id)
     {
@@ -42,6 +62,18 @@ public:
         }
     }
 
+    /// <summary>
+    /// 为了解耦GetFunctor与模板的编写
+    /// </summary>
+    /// <typeparam name="RETURN_TYPE"></typeparam>
+    /// <typeparam name="...ARGS_TYPE"></typeparam>
+    /// <param name="any_func"></param>
+    /// <returns></returns>
+    template<typename RETURN_TYPE,typename... ARGS_TYPE>
+    std::function<RETURN_TYPE(ARGS_TYPE...)> CastAnyToFunction(std::any any_func)
+    {
+        return std::any_cast<std::function<RETURN_TYPE(ARGS_TYPE...)>>(any_func);
+    }
 
     /// <summary>
     /// 设置一个函子的格式，返回值 + 参数列表

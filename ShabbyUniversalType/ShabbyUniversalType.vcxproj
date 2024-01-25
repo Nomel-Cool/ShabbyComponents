@@ -130,6 +130,9 @@
   <ItemGroup>
     <ClInclude Include="QuestType.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="quest_type_test.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
