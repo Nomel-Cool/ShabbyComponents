@@ -7,6 +7,7 @@
 #include <functional>
 #include <string>
 #include <any>
+#include <future>
 
 /// <summary>
 /// 一种回调函数操作类
@@ -46,7 +47,7 @@ public:
     /// </summary>
     /// <typeparam name="RETURN_TYPE">模板参数: 返回值类型</typeparam>
     /// <typeparam name="...ARGS_TYPE">模板参数: 形参类型</typeparam>
-    /// <param name="func_id">函子标签id</param>
+    /// <param name="func_id">函子在map中的key值</param>
     /// <returns>可调用函数</returns>
     template<typename RETURN_TYPE, typename... ARGS_TYPE>
     std::function<RETURN_TYPE(ARGS_TYPE...)> GetFunctor(std::string func_id)
@@ -67,12 +68,25 @@ public:
     /// </summary>
     /// <typeparam name="RETURN_TYPE"></typeparam>
     /// <typeparam name="...ARGS_TYPE"></typeparam>
-    /// <param name="any_func"></param>
+    /// <param name="any_func">函子在map中的key值</param>
     /// <returns></returns>
     template<typename RETURN_TYPE,typename... ARGS_TYPE>
     std::function<RETURN_TYPE(ARGS_TYPE...)> CastAnyToFunction(std::any any_func)
     {
         return std::any_cast<std::function<RETURN_TYPE(ARGS_TYPE...)>>(any_func);
+    }
+    
+    /// <summary>
+    /// 返回异步函子的future
+    /// </summary>
+    /// <typeparam name="RETURN_TYPE">函子返回值类型</typeparam>
+    /// <typeparam name="...ARGS_TYPE">函子参数列表类型</typeparam>
+    /// <param name="any_asyncfunc">函子在map中的key值</param>
+    /// <returns></returns>
+    template<typename RETURN_TYPE, typename... ARGS_TYPE>
+    std::future<RETURN_TYPE(ARGS_TYPE...)> CastAnyToFuture(std::any any_asyncfunc)
+    {
+        return std::any_cast<std::future<RETURN_TYPE(ARGS_TYPE...)>>(any_asyncfunc);
     }
 
     /// <summary>
@@ -86,6 +100,19 @@ public:
     void SetFunctor(std::string func_id, std::function<RETURN_TYPE(ARGS_TYPE...)> func)
     {
         quest_type[func_id] = func;
+    }
+
+    /// <summary>
+    /// 鉴于函子的使用还有异步，因此使用std::promise负责签发函子的操作结果作为std::future
+    /// </summary>
+    /// <typeparam name="RETURN_TYPE">函子返回值类型</typeparam>
+    /// <typeparam name="...ARGS_TYPE">函子参数列表类型</typeparam>
+    /// <param name="func_id">函子在map中的key值</param>
+    /// <param name="any_asyncfunc">函数本身，建议填写lambda</param>
+    template<typename RETURN_TYPE, typename... ARGS_TYPE>
+    void SetAsyncFunctor(std::string func_id, std::promise<RETURN_TYPE(ARGS_TYPE...)> any_asyncfunc)
+    {
+        quest_type[func_id] = any_asyncfunc;
     }
 
 
