@@ -97,7 +97,7 @@ public:
         QuestNode p_node(async_quest);
         p_node.quest_id = quest_id;
         QuestList.AddQuestToQueue(p_node);
-        _cond.notify_all(); // 当任务队列加入任务时唤醒线程容器进行消费
+        _cond.notify_one(); // 当任务队列加入任务时唤醒线程容器进行消费
     }
 
     /// <summary>
@@ -105,39 +105,42 @@ public:
     /// </summary>
     /// <typeparam name="RETURN_TYPE">函子返回值，由于是回调应当为void</typeparam>
     /// <typeparam name="...ARGS_TYPE">函子调用参数类型列表</typeparam>
-    void ConsumeQuestFromPool()
+    /// <return>返回任务指针</return>
+    std::shared_ptr<std::packaged_task<QuestType()>> ConsumeQuestFromPool()
     {
         std::unique_lock lock(_mutex);
-        while (ConvertBusyWatcherToIndex() == -1 || QuestList.Empty()) // 当可用线程为空时 或者 任务列表为空时 将无法消费遂执行阻塞
+        while (QuestList.Empty()) // 当可用线程为空时 或者 任务列表为空时 将无法消费遂执行阻塞
             _cond.wait(lock); // 在等待时会自动释放锁
-        size_t available_thread_index = ConvertBusyWatcherToIndex();
         auto quest_node = QuestList.GetQuestFromQueue();
         auto async_func = quest_node->GetAsyncFunctor(quest_node->quest_id);
         auto func = quest_node->CastAnyToPromise<QuestType>(async_func);
         if (func == nullptr)
         {
             std::cout << "Empty func" << std::endl;
-            return;
+            return nullptr;
         }
-        (*func)();
+        return func;
+    }
+
+    void work_thread()
+    {
+        while (true)
+        {
+            auto p_func = ConsumeQuestFromPool();
+            (*p_func)();
+        }
     }
 
     /// <summary>
-    /// 线程池运行，执行消费
+    /// 之前一直理解错了，线程池的每个线程生来都有自己的任务的就是不停地获取任务队列的任务
     /// </summary>
     void LaunchPool()
     {
-        std::thread _t(
-            [this]()
-            {
-                stop_flag = false;
-                while (!stop_flag)
-                {
-                    ConsumeQuestFromPool();
-                }
-            }
-        );
-        _t.detach();
+        auto it_thread_list = ThreadList.begin();
+        for (; it_thread_list != ThreadList.end(); ++it_thread_list)
+        {
+            it_thread_list->thread_node = std::thread(&ShabbyThreadPool::work_thread, this);
+        }
     }
 
     /// <summary>
