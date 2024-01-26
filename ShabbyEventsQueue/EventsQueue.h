@@ -36,10 +36,10 @@ public:
 	/// 将一个事件常量入队
 	/// </summary>
 	/// <param name="enlisted_node">事件常量指针</param>
-	void AddQuestToQueue(T* enlisted_node)
+	void AddQuestToQueue(T enlisted_node)
 	{
 		std::lock_guard<std::mutex> lock(mutex_);
-		inner_queue.push(*enlisted_node);
+		inner_queue.push(enlisted_node);
 		// 当有消息入队以后，尝试唤醒阻塞的获取操作，核心是消费者和生产者由Queue的size=0这个点分隔
 		cond_.notify_all();
 	}

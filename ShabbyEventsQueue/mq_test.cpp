@@ -12,7 +12,7 @@ void AddQ()
 		printf("AddQ\n");
 		QuestType* func_set = new QuestType();
 		func_set->SetFunctor<void, int, int>("ADD", std::function<void(int, int)>([=](int a, int b) { printf((std::to_string(a * i + b) + "\n").c_str()); }));
-		eq.AddQuestToQueue(func_set);
+		eq.AddQuestToQueue(*func_set);
 		if (i++ == 10)
 			break;
 	}
