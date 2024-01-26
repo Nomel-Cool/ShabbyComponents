@@ -94,7 +94,7 @@ public:
     {
         std::unique_lock lock(_mutex);
         auto any_func = async_quest.GetFunctor("quest_id");
-        std::future<RETURN_TYPE(ARGS_TYPE...)> concrete_func = async_quest.CastAnyToFuture<RETURN_TYPE, ARGS_TYPE...>(any_func);
+        auto concrete_func = async_quest.CastAnyToPromise<RETURN_TYPE>(any_func);
         QuestNode p_node(async_quest);
         p_node.quest_id = quest_id;
         QuestList.AddQuestToQueue(p_node);
@@ -108,15 +108,16 @@ public:
     /// <typeparam name="...ARGS_TYPE">函子调用参数类型列表</typeparam>
     /// <param name="func_id">函子ID</param>
     /// <param name="...args">实参列表</param>
-    template<typename RETURN_TYPE, typename... ARGS_TYPE>
-    void ConsumeQuestFromPool(std::string func_id, ARGS_TYPE... args)
+    void ConsumeQuestFromPool(std::string func_id)
     {
         std::unique_lock lock(_mutex);
         while (ConvertBusyWatcherToIndex() == -1 || QuestList.Empty()) // 当可用线程为空时 或者 任务列表为空时 将无法消费遂执行阻塞
             _cond.wait(lock); // 在等待时会自动释放锁
         size_t available_thread_index = ConvertBusyWatcherToIndex();
         auto quest_node = QuestList.GetQuestFromQueue();
-        auto async_func = quest_node->GetFunctor(quest_node->quest_id);
+        auto async_func = quest_node->GetAsyncFunctor(quest_node->quest_id);
+        auto func = quest_node->CastAnyToPromise<QuestType>(async_func);
+        (*func)();
     }
 
     /// <summary>

@@ -59,6 +59,25 @@ public:
     }
 
     /// <summary>
+    /// 默认返回唯一
+    /// </summary>
+    /// <returns></returns>
+    auto GetAsyncFunctor()
+    {
+        try
+        {
+            if (quest_type.size() == 1)
+                return *(quest_type.begin());
+        }
+        catch (std::bad_any_cast& ex)
+        {
+            // 处理异常
+            throw ex;
+        }
+    }
+
+
+    /// <summary>
     /// 通过函子特征获取封装的函数表达式
     /// (TODO)应当使用枚举体加映射获取函子ID，这样做的好处是可以哈希保证唯一性
     /// 这里的转换并不安全，前提是你必须清楚函子ID对应的函数结构，否则就会抛出异常
@@ -121,7 +140,7 @@ public:
     /// <typeparam name="RETURN_TYPE">函子返回值类型</typeparam>
     /// <typeparam name="...ARGS_TYPE">函子参数列表类型</typeparam>
     /// <param name="any_asyncfunc">函子在map中的key值</param>
-    /// <returns></returns>
+    /// <returns>指向函子的智能指针</returns>
     template<typename RETURN_TYPE>
     auto CastAnyToPromise(std::any any_asyncfunc)
     {
