@@ -20,9 +20,9 @@
 class QuestNode : public QuestType
 {
 public:
-	QuestNode():isUsing(false),isTerminated(false){}
-	bool isUsing;
-	bool isTerminated;
+    QuestNode(const QuestType& quest) : QuestType(quest), isUsing(false), isTerminated(false) {}
+    bool isUsing;
+    bool isTerminated;
     std::string quest_id;
 };
 
@@ -32,6 +32,7 @@ public:
 class ThreadNode
 {
 public:
+    ThreadNode() :isBusy(false) {}
     bool isBusy;
     std::thread thread_node;
 };
@@ -79,7 +80,7 @@ public:
     /// </summary>
     /// <param name="thread_amount">线程池内线程数量</param>
     /// <returns>容量更改操作结果</returns>
-    bool ResizePool(int thread_amount)
+    void ResizePool(int thread_amount)
     {
         ThreadList.resize(thread_amount);
         BusyWatcher = (int)pow(2, thread_amount) - 1;
@@ -90,15 +91,13 @@ public:
     /// </summary>
     /// <param name="quest">要求异步函子</param>
     template<typename RETURN_TYPE, typename... ARGS_TYPE>
-    void AddQuestToPool(QuestType async_quest, std::string quest_id)
+    void AddQuestToPool(std::string quest_id, QuestType async_quest)
     {
         std::unique_lock lock(_mutex);
-        auto any_func = async_quest.GetFunctor("quest_id");
-        auto concrete_func = async_quest.CastAnyToPromise<RETURN_TYPE>(any_func);
         QuestNode p_node(async_quest);
         p_node.quest_id = quest_id;
         QuestList.AddQuestToQueue(p_node);
-        _cond.notify_one(); // 当任务队列加入任务时唤醒线程容器进行消费
+        _cond.notify_all(); // 当任务队列加入任务时唤醒线程容器进行消费
     }
 
     /// <summary>
@@ -106,9 +105,7 @@ public:
     /// </summary>
     /// <typeparam name="RETURN_TYPE">函子返回值，由于是回调应当为void</typeparam>
     /// <typeparam name="...ARGS_TYPE">函子调用参数类型列表</typeparam>
-    /// <param name="func_id">函子ID</param>
-    /// <param name="...args">实参列表</param>
-    void ConsumeQuestFromPool(std::string func_id)
+    void ConsumeQuestFromPool()
     {
         std::unique_lock lock(_mutex);
         while (ConvertBusyWatcherToIndex() == -1 || QuestList.Empty()) // 当可用线程为空时 或者 任务列表为空时 将无法消费遂执行阻塞
@@ -117,6 +114,11 @@ public:
         auto quest_node = QuestList.GetQuestFromQueue();
         auto async_func = quest_node->GetAsyncFunctor(quest_node->quest_id);
         auto func = quest_node->CastAnyToPromise<QuestType>(async_func);
+        if (func == nullptr)
+        {
+            std::cout << "Empty func" << std::endl;
+            return;
+        }
         (*func)();
     }
 
@@ -125,9 +127,33 @@ public:
     /// </summary>
     void LaunchPool()
     {
-        while (true)
-        {
+        std::thread _t(
+            [this]()
+            {
+                stop_flag = false;
+                while (!stop_flag)
+                {
+                    ConsumeQuestFromPool();
+                }
+            }
+        );
+        _t.detach();
+    }
 
+    /// <summary>
+    /// 释放线程池所有线程包括自身
+    /// </summary>
+    void StopPool()
+    {
+        stop_flag = true;
+        for(auto& t : ThreadList)
+        {
+            if (t.thread_node.joinable())
+                t.thread_node.join();
+        }
+        if (worker_thread.joinable())
+        {
+            worker_thread.join();
         }
     }
 
@@ -135,6 +161,9 @@ private:
     EventsQueue<QuestNode> QuestList;
     std::vector<ThreadNode> ThreadList;
     int BusyWatcher;
+
+    std::atomic<bool> stop_flag = false;
+    std::thread worker_thread;
 
     std::condition_variable _cond;
     std::mutex _mutex;
@@ -146,7 +175,22 @@ private:
 
     size_t ConvertBusyWatcherToIndex()
     {
+        unsigned long index;
+        if (_BitScanForward(&index, BusyWatcher)) // 微软版本，在GCC和Clang中，你可以使用__builtin_ffs函数来达到同样的效果
+        {
+            BusyWatcher &= ~(1 << index); // 将找到的位设置为0
+            return index;
+        }
+        return -1; // 如果所有的位都是0，返回-1表示没有可用的线程
+    }
 
+    /// <summary>
+    /// 更新当前线程空闲状态
+    /// </summary>
+    /// <param name="using_index">被使用线程index</param>
+    void UpdateBusyWatcher(int using_index)
+    {
+        BusyWatcher &= ~(1 << using_index); // 将第using_index位设置为0
     }
 
     static std::atomic<ShabbyThreadPool*> instance;
