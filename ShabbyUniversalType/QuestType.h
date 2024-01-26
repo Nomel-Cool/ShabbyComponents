@@ -8,6 +8,7 @@
 #include <string>
 #include <any>
 #include <future>
+#include <iostream>
 
 /// <summary>
 /// 一种回调函数操作类
@@ -144,7 +145,12 @@ public:
     template<typename RETURN_TYPE>
     auto CastAnyToPromise(std::any any_asyncfunc)
     {
-        return std::any_cast<std::shared_ptr<std::packaged_task<RETURN_TYPE()>>>(any_asyncfunc);
+        try {
+            return std::any_cast<std::shared_ptr<std::packaged_task<RETURN_TYPE()>>>(any_asyncfunc);
+        }
+        catch (const std::bad_any_cast& e) {
+            std::cerr << "Bad any cast: " << e.what() << '\n';
+        }
     }
 
     /// <summary>

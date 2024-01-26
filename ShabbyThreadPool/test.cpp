@@ -2,21 +2,23 @@
 #include <string>
 #include <iostream>
 
-int add(int a, int b)
+QuestType add(int a, int b)
 {
-    return a + b;
+    std::cout << "Calculate Result: " << a + b << std::endl;
+    QuestType tmp;
+    return tmp;
 }
 int main()
 {
     QuestType func_set;
-    auto future = func_set.SetAsyncFunctor<int, int, int>("AsyncADD", std::function<int(int, int)>(add), 3, 4);
+    auto future = func_set.SetAsyncFunctor<QuestType, int, int>("AsyncADD", std::function<QuestType(int, int)>(add), 3, 4);
 
     ShabbyThreadPool* p_pool = ShabbyThreadPool::GetPoolInstance();
     p_pool->ResizePool(3);
     p_pool->LaunchPool();
-    p_pool->AddQuestToPool<int, int, int>("AsyncADD", func_set);
+    p_pool->AddQuestToPool<QuestType, int, int>("AsyncADD", func_set);
 
-    std::cout << future.get() << std::endl;
+    future.get();
 
     //p_pool->StopPool();
 }
