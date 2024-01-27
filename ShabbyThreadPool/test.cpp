@@ -29,5 +29,5 @@ int main()
     future3.get();
     future4.get();
 
-    //p_pool->StopPool();
+    p_pool->StopPool();
 }

@@ -32,8 +32,7 @@ public:
 class ThreadNode
 {
 public:
-    ThreadNode() :isBusy(false) {}
-    bool isBusy;
+    ThreadNode(){}
     std::thread thread_node;
 };
 
@@ -52,6 +51,16 @@ public:
 /// 线程元被任务消费过程中需要加锁，同时任务完成前也需要加锁
 /// 支持任务滞后操作（当任务没有在规定条件下被执行，将被滞后或取消）
 /// 
+/// 原理：
+/// 任务队列是线程安全的，消费者是线程池，生产者是任务节点
+/// 任务节点添加到线程池唤醒线程池
+/// 线程池中的【每一个线程都处于争抢与监听任务队列】条件循环状态
+/// 
+/// 数据流转：
+/// 1.加入任务节点
+/// 2.线程池某一线程争抢得到任务节点并【阻塞它自己】执行
+/// 3.线程执行完所获取的任务后，继续投入监听任务队列
+/// 
 /// </summary>
 class ShabbyThreadPool
 {
@@ -65,7 +74,7 @@ public:
         */
         ShabbyThreadPool* tmp = instance.load(std::memory_order_acquire);
         if (!tmp) {
-            std::lock_guard<std::mutex> lock(mutex);
+            std::lock_guard<std::mutex> lock(init_mutex);
             tmp = instance.load(std::memory_order_relaxed);
             if (!tmp) {
                 tmp = new ShabbyThreadPool;
@@ -93,7 +102,7 @@ public:
     template<typename RETURN_TYPE, typename... ARGS_TYPE>
     void AddQuestToPool(std::string quest_id, QuestType async_quest)
     {
-        std::unique_lock lock(_mutex);
+        std::unique_lock lock(quest_mutex);
         QuestNode p_node(async_quest);
         p_node.quest_id = quest_id;
         QuestList.AddQuestToQueue(p_node);
@@ -108,7 +117,7 @@ public:
     /// <return>返回任务指针</return>
     std::shared_ptr<std::packaged_task<QuestType()>> ConsumeQuestFromPool()
     {
-        std::unique_lock lock(_mutex);
+        std::unique_lock lock(quest_mutex);
         while (QuestList.Empty()) // 当可用线程为空时 或者 任务列表为空时 将无法消费遂执行阻塞
             _cond.wait(lock); // 在等待时会自动释放锁
         auto quest_node = QuestList.GetQuestFromQueue();
@@ -122,12 +131,18 @@ public:
         return func;
     }
 
-    void work_thread()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="thread_index"></param>
+    void work_thread(int thread_index)
     {
-        while (true)
+        while (!stop_flag)
         {
             auto p_func = ConsumeQuestFromPool();
+            UpdateBusyWatcher(thread_index); // 任务开始时
             (*p_func)();
+            UpdateBusyWatcher(thread_index); // 任务完成后
         }
     }
 
@@ -139,7 +154,7 @@ public:
         auto it_thread_list = ThreadList.begin();
         for (; it_thread_list != ThreadList.end(); ++it_thread_list)
         {
-            it_thread_list->thread_node = std::thread(&ShabbyThreadPool::work_thread, this);
+            it_thread_list->thread_node = std::thread(&ShabbyThreadPool::work_thread, this, it_thread_list - ThreadList.begin());
         }
     }
 
@@ -169,8 +184,14 @@ private:
     std::thread worker_thread;
 
     std::condition_variable _cond;
-    std::mutex _mutex;
+    std::mutex quest_mutex;
 
+    std::mutex watcher_mutex;
+
+    static std::atomic<ShabbyThreadPool*> instance;
+    static std::mutex init_mutex;
+
+private:
     ShabbyThreadPool() { /*...*/ }
     ~ShabbyThreadPool() { /*...*/ }
     ShabbyThreadPool(const ShabbyThreadPool&) = delete;
@@ -193,15 +214,13 @@ private:
     /// <param name="using_index">被使用线程index</param>
     void UpdateBusyWatcher(int using_index)
     {
-        BusyWatcher &= ~(1 << using_index); // 将第using_index位设置为0
+        std::lock_guard lock(watcher_mutex);
+        BusyWatcher ^= (1 << using_index); // 将第using_index位异或1，其余异或0
     }
-
-    static std::atomic<ShabbyThreadPool*> instance;
-    static std::mutex mutex;
 };
 
 // 在类外初始化静态成员
 std::atomic<ShabbyThreadPool*> ShabbyThreadPool::instance;
-std::mutex ShabbyThreadPool::mutex;
+std::mutex ShabbyThreadPool::init_mutex;
 
 #endif // !SHABBY_THREAD_POOL_H
