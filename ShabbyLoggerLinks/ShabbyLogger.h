@@ -23,10 +23,9 @@ namespace shabby
 	public:
 		LogBase() {}
 		virtual ~LogBase() {}
-		virtual void TakeALog(QuestType msg);
+		virtual void TakeALog(QuestType msg) = 0;
 		virtual std::vector<QuestType> QueryLogsFrom(LogDirection log_repo) = 0;
 	private:
-	
 	};
 }
 
