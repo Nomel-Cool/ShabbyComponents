@@ -1,6 +1,6 @@
 #include "EventsQueue.h"
 #include <thread>
-
+using namespace shabby;
 
 EventsQueue<QuestType> eq;
 

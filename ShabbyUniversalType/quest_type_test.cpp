@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "QuestType.h"
+using namespace shabby;
 
 int add(int a, int b)
 {
