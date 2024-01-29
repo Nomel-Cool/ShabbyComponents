@@ -180,7 +180,7 @@ namespace shabby
     private:
         EventsQueue<QuestNode> QuestList;
         std::vector<ThreadNode> ThreadList;
-        int BusyWatcher;
+        int BusyWatcher = 0;
 
         std::atomic<bool> stop_flag = false;
         std::thread worker_thread;

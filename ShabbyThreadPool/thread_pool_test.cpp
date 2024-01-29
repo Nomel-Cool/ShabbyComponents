@@ -1,6 +1,7 @@
 #include "ShabbyThreadPool.h"
 #include <string>
 #include <iostream>
+using namespace shabby;
 
 QuestType add(int a, int b)
 {
