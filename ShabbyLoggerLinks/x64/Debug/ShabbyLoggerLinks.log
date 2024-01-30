@@ -1,0 +1,9 @@
+﻿  logger_test.cpp
+F:\WorkPlace\VS\ShabbyComponents\ShabbyLoggerLinks\ShabbyLogger.h(49,7): error C2535: “int shabby::A::test(int)”: 已经定义或声明成员函数
+  (编译源文件“logger_test.cpp”)
+  F:\WorkPlace\VS\ShabbyComponents\ShabbyLoggerLinks\ShabbyLogger.h(44,7):
+  参见“shabby::A::test”的声明
+  
+F:\WorkPlace\VS\ShabbyComponents\ShabbyLoggerLinks\ShabbyLogger.h(47,11): warning C4244: “return”: 从“double”转换到“int”，可能丢失数据
+  (编译源文件“logger_test.cpp”)
+  
