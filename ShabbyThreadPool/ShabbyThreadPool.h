@@ -134,21 +134,6 @@ namespace shabby
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="thread_index"></param>
-        void work_thread(int thread_index)
-        {
-            while (!stop_flag)
-            {
-                auto p_func = ConsumeQuestFromPool();
-                UpdateBusyWatcher(thread_index); // 任务开始时
-                (*p_func)();
-                UpdateBusyWatcher(thread_index); // 任务完成后
-            }
-        }
-
-        /// <summary>
         /// 之前一直理解错了，线程池的每个线程生来都有自己的任务的就是不停地获取任务队列的任务
         /// </summary>
         void LaunchPool()
@@ -177,6 +162,21 @@ namespace shabby
             }
         }
 
+    protected:
+        /// <summary>
+        /// 线程池消耗启动线程
+        /// </summary>
+        /// <param name="thread_index"></param>
+        void work_thread(int thread_index)
+        {
+            while (!stop_flag)
+            {
+                auto p_func = ConsumeQuestFromPool();
+                UpdateBusyWatcher(thread_index); // 任务开始时
+                (*p_func)();
+                UpdateBusyWatcher(thread_index); // 任务完成后
+            }
+        }
     private:
         EventsQueue<QuestNode> QuestList;
         std::vector<ThreadNode> ThreadList;
