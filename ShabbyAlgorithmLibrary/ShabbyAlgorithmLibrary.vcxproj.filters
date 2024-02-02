@@ -18,5 +18,8 @@
     <ClInclude Include="Compressing.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sorting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
