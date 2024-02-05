@@ -102,14 +102,11 @@ namespace shabby
 		{
 			// 加入压缩算法
 			TextHuffmanCompressing huffman_compressing;
-			huffman_compressing.BuildHuffmanTree(msg);
-			auto huffman_dictionary = huffman_compressing.GetHuffmanCode();
-			std::string compressed_str = "";
-			for (const char& c : msg)
-			{
-				compressed_str += huffman_dictionary[c];
-			}
+			int padding = 0;
+			std::string compressed_str = huffman_compressing.GetHuffmanCompressedText(msg, padding);
+			
 			// 判断日志输出位置，选择使用文件还是数据库管理控件
+
 		}
 	private:
 
