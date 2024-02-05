@@ -25,10 +25,10 @@ namespace shabby
 	class HuffmanTreeNodeForm
 	{
 	public:
-		HuffmanTreeNodeForm() : freq(0), origin_char(""), huffman_code("") {}
+		HuffmanTreeNodeForm() : freq(0), origin_char("") {}
 		uint32_t freq;
 		std::string origin_char;
-		std::string huffman_code;
+		std::vector<bool> huffman_code;
 		// 优先队列对于复杂类型需要重载比较符号
 		bool operator>(const HuffmanTreeNodeForm& other) const {
 			return freq > other.freq;
@@ -58,10 +58,50 @@ namespace shabby
 			ASCII_Frequency.clear();
 		}
 		/// <summary>
-		/// 从已有的字符文本建立哈夫曼树
+		/// 求取对应的哈夫曼压缩字符串
 		/// </summary>
-		/// <param name="text">字符文本</param>
-		/// <returns>哈夫曼二叉树</returns>
+		/// <param name="valid_count"></param>
+		virtual std::string GetHuffmanCompressedText(std::string msg, int& valid_count)
+		{
+			BuildHuffmanTree(msg);
+			GetHuffmanMap();
+			std::string compressed_code = "";
+			int bit_count = 0;
+			char temp_char = 0;
+			for (auto& c : msg)
+			{
+				auto key = m_huffman_dictionary[std::string(1, c)];
+				auto code = key.huffman_code;
+
+				for (int i = 0; i < code.size(); ++i)
+				{
+					temp_char <<= 1;
+					if (code[i])
+						temp_char |= 1;
+					bit_count++;
+
+					if (bit_count == 8)
+					{
+						compressed_code += temp_char;
+						temp_char = 0;
+						bit_count = 0;
+					}
+				}
+			}
+			// 如果最后一个字符的bool值不足8个，使用0来填充，记录最后一个字符的有效位数
+			valid_count = bit_count;
+			// 如果最后一个字符还有有效位，则放进去
+			if (valid_count > 0)
+				compressed_code += temp_char;
+			return compressed_code;
+		}
+		virtual uint32_t CalWeight() { return 0; }
+	protected:
+		/// <summary>
+/// 从已有的字符文本建立哈夫曼树
+/// </summary>
+/// <param name="text">字符文本</param>
+/// <returns>哈夫曼二叉树</returns>
 		virtual void BuildHuffmanTree(std::string text)
 		{
 			// 获取文本频率
@@ -77,14 +117,14 @@ namespace shabby
 
 				// 设置右节点
 				auto right_value = frequency_queue.top();
-				TreeNode<HuffmanTreeNodeForm> *right = right_value;
+				TreeNode<HuffmanTreeNodeForm>* right = right_value;
 				frequency_queue.pop();
 
 				// 设置父节点
 				HuffmanTreeNodeForm parent_value;
 				parent_value.origin_char = left->GetData().origin_char + right->GetData().origin_char;
 				parent_value.freq = left->GetData().freq + right->GetData().freq;
-				TreeNode<HuffmanTreeNodeForm> *parent = new TreeNode<HuffmanTreeNodeForm>();
+				TreeNode<HuffmanTreeNodeForm>* parent = new TreeNode<HuffmanTreeNodeForm>();
 				parent->SetData(parent_value);
 				parent->SetParentNode(parent);
 				parent->SetLeftChild(left);
@@ -110,32 +150,34 @@ namespace shabby
 		/// </summary>
 		/// <param name="huffman_tree">已经建立完毕的哈夫曼树</param>
 		/// <returns></returns>
-		virtual std::unordered_map<std::string,std::string> GetHuffmanCode()
+		virtual void GetHuffmanMap()
 		{
-			std::unordered_map<std::string, std::string> huffman_dictionary;
-			for(auto& node : m_huffman_tree.m_tree)
+			std::unordered_map<std::string, HuffmanTreeNodeForm> huffman_dictionary;
+			for (auto& node : m_huffman_tree.m_tree)
 			{
 				if (node->GetLeftChild() == nullptr && node->GetRightChild() == nullptr)
 				{
-					auto data = node->GetData();
+					auto r_data = node->GetData(); // 保存叶子节点数据副本
 					while (node != node->GetParentNode())
 					{
 						auto _left = node->GetParentNode()->GetLeftChild();
 						auto _right = node->GetParentNode()->GetRightChild();
 						if (_left == node)
 						{
-							data.huffman_code.insert(data.huffman_code.begin(), '0');
+							r_data.huffman_code.push_back(false);
 						}
 						else if (_right == node)
 						{
-							data.huffman_code.insert(data.huffman_code.begin(), '1');
+							r_data.huffman_code.push_back(true);
 						}
 						node = node->GetParentNode();
 					}
-					huffman_dictionary.insert(std::pair<std::string,std::string>(data.origin_char, data.huffman_code));
+					huffman_dictionary.insert(std::pair<std::string, HuffmanTreeNodeForm>(r_data.origin_char, r_data));
 				}
 			}
-			return huffman_dictionary;
+			// 释放树形结构所有动态指针
+			//m_huffman_tree.FreeTree();
+			m_huffman_dictionary = huffman_dictionary;
 		}
 		/// <summary>
 		/// 计算文本频率，并正序排序
@@ -155,21 +197,21 @@ namespace shabby
 				{
 					HuffmanTreeNodeForm value;
 					value.freq = ASCII_Frequency[j];
-					value.origin_char = std::string(1,(char)j);
-					TreeNode<HuffmanTreeNodeForm> *node = new TreeNode<HuffmanTreeNodeForm>();
+					value.origin_char = std::string(1, (char)j);
+					TreeNode<HuffmanTreeNodeForm>* node = new TreeNode<HuffmanTreeNodeForm>();
 					node->SetData(value);
 					frequency_queue.push(node);
 				}
 			}
 		}
-		virtual uint32_t CalWeight() { return 0; }
-	protected:
+
 		std::vector<uint32_t> ASCII_Frequency; //ASCII码编码
 		std::priority_queue<TreeNode<HuffmanTreeNodeForm>*,
 			std::vector<TreeNode<HuffmanTreeNodeForm>*>,
 			std::greater<TreeNode<HuffmanTreeNodeForm>*>> frequency_queue;
 	private:
 		BinaryTree<HuffmanTreeNodeForm> m_huffman_tree;
+		std::unordered_map<std::string, HuffmanTreeNodeForm> m_huffman_dictionary;
 	};
 }
 #endif // !COMPRESSING_H

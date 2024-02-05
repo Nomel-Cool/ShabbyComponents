@@ -6,18 +6,9 @@ int main()
 {
 	std::string msg = "Hello World";
 	TextHuffmanCompressing huffman_compressing;
-	huffman_compressing.BuildHuffmanTree(msg);
-	auto huffman_dictionary = huffman_compressing.GetHuffmanCode();
-	std::string compressed_str = "";
-	for (const char& c : msg)
-	{
-		std::string t(1, c);
-		compressed_str += huffman_dictionary[t];
-	}
-	std::cout << std::endl;
-	for (const auto& pair : huffman_dictionary) {
-		std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
-	}
-	std::cout << compressed_str << std::endl;
+	int padding = 0;
+	std::string compressed_code = huffman_compressing.GetHuffmanCompressedText(msg, padding);
+
+    std::cout << compressed_code << " ------ " << compressed_code.size() * 8 - padding << " ------ " << padding << std::endl;
 	return 0;
 }
