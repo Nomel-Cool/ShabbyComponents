@@ -69,13 +69,7 @@ namespace shabby
 	{
 	public:
 		BinaryTree() {}
-		~BinaryTree()
-		{
-			for (auto& node : m_tree)
-			{
-				delete node;
-			}
-		}
+		~BinaryTree() {}
 		/// <summary>
 		/// 插入设置好子关系以及父关系的节点来建立
 		/// </summary>
@@ -83,6 +77,20 @@ namespace shabby
 		virtual void BuildByAdding(TreeNode<T>* input_node)
 		{
 			m_tree.push_back(input_node);
+		}
+
+		/// <summary>
+		/// 释放哈夫曼树的所有动态指针内存
+		/// </summary>
+		virtual void FreeTree()
+		{
+			for (TreeNode<T>* node : m_tree)
+			{
+				delete node->GetLeftChild();
+				delete node->GetRightChild();
+				delete node->GetParentNode();
+				delete node;
+			}
 		}
 		/// <summary>
 		/// 设置根节点
@@ -122,7 +130,7 @@ namespace shabby
 
 		}
 
-		TreeNode<T>* m_root;
+		TreeNode<T>* m_root = nullptr;
 		std::vector<TreeNode<T>*> m_tree;
 	private:
 	};

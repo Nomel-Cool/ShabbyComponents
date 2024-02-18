@@ -106,7 +106,15 @@ namespace shabby
 			std::string compressed_str = huffman_compressing.GetHuffmanCompressedText(msg, padding);
 			
 			// 判断日志输出位置，选择使用文件还是数据库管理控件
+			switch (log_destination)
+			{
+				case ToFile:
 
+				break;
+				case ToDataBase:
+				
+				break;
+			}
 		}
 	private:
 
