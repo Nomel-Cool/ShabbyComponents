@@ -46,7 +46,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="i">索引i</param>
 		/// <returns>如果第i个位置有节点，则返回对应的节点，否则按照vector的at函数报错</returns>
-		virtual std::shared_ptr<TopoNode<T> > GetTheIthChildNode(size_t i)
+		virtual std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > GetTheIthChildNodeShared(size_t i)
 		{
 			return shptr_out.at(i);
 		}
@@ -55,7 +55,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="i">索引i</param>
 		/// <returns>如果第i个位置有节点，则返回对应的节点，否则按照vector的at函数报错</returns>
-		virtual std::unique_ptr<TopoNode<T> > GetTheIthChildNode(size_t i)
+		virtual std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > GetTheIthChildNodeUnique(size_t i)
 		{
 			return unique_out.at(i);
 		}
@@ -64,7 +64,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="i">索引i</param>
 		/// <returns>如果第i个位置有节点，则返回对应的节点，否则按照vector的at函数报错</returns>
-		virtual std::shared_ptr<TopoNode<T> > GetTheIthParentNode(size_t i)
+		virtual std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > GetTheIthParentNodeShared(size_t i)
 		{
 			return shptr_in.at(i);
 		}
@@ -73,7 +73,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="i">索引i</param>
 		/// <returns>如果第i个位置有节点，则返回对应的节点，否则按照vector的at函数报错</returns>
-		virtual std::unique_ptr<TopoNode<T> > GetTheIthParentNode(size_t i)
+		virtual std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > GetTheIthParentNodeUnique(size_t i)
 		{
 			return unique_in.at(i);
 		}
@@ -82,7 +82,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="out_node">输入的单边图的节点</param>
 		/// <param name="i">单边点容器索引</param>
-		virtual void SetTheIthChildNode(std::unique_ptr<TopoNode<T> > out_node, size_t i)
+		virtual void SetTheIthChildNode(std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& out_node, size_t i)
 		{
 			auto noted_ptr = unique_out.at(i);
 			noted_ptr(std::move(in_node));
@@ -92,7 +92,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="out_node">输入的多边图节点</param>
 		/// <param name="i">多边点容器索引</param>
-		virtual void SetTheIthChildNode(std::shared_ptr<TopoNode<T> > out_node, size_t i)
+		virtual void SetTheIthChildNode(std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& out_node, size_t i)
 		{
 			auto noted_ptr = shptr_out.at(i);
 			noted_ptr(std::move(in_node));
@@ -102,7 +102,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="in_node">输入的单边图节点</param>
 		/// <param name="i">单边点容器索引</param>
-		virtual void SetTheIthParentNode(std::unique_ptr<TopoNode<T> > in_node, size_t i)
+		virtual void SetTheIthParentNode(std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& in_node, size_t i)
 		{
 			auto noted_ptr = unique_in.at(i);
 			noted_ptr(std::move(in_node));
@@ -112,7 +112,7 @@ namespace shabby
 		/// </summary>
 		/// <param name="in_node">输入的重边图节点</param>
 		/// <param name="i">重边点容器索引</param>
-		virtual void SetTheIthParentNode(std::shared_ptr<TopoNode<T> > in_node, size_t i)
+		virtual void SetTheIthParentNode(std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& in_node, size_t i)
 		{
 			auto noted_ptr = shptr_in.at(i);
 			noted_ptr(std::move(in_node));
@@ -136,8 +136,8 @@ namespace shabby
 		virtual ~TopoNode() {}
 	private:
 		T Data;
-		std::vector<std::shared_ptr<TopoNode<T> > > shptr_in, shptr_out; // 使用共享指针可以实现有向重边指向结构
-		std::vector<std::unique_ptr<TopoNode<T> > > unique_in, unique_out; // 使用独享指针可以实现有向无重边指向结构，且效率比shared_ptr高
+		std::vector<std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > > shptr_in, shptr_out; // 使用共享指针可以实现有向重边指向结构
+		std::vector<std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> > > unique_in, unique_out; // 使用独享指针可以实现有向无重边指向结构，且效率比shared_ptr高
 	};
 }
 
