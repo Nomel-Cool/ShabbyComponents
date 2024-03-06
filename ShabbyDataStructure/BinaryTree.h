@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef Binary_Tree_H
 #define Binary_Tree_H
 
@@ -12,45 +12,134 @@ using namespace shabby;
 namespace shabby
 {
 	/// <summary>
-	/// ÎªÁË¹ÜÀíÊ÷ĞÎ½á¹¹µÄÖ¸ÕëÁ´½Ó£¬±£Ö¤ÄÜ¹»ÓĞĞ§µØÉ¾³ı£¬Ê÷µÄËùÓĞÖ¸Õë¶¼Ó¦¸Ã±»±£´æ£¬²»Ê¹ÓÃ¸Ã½á¹¹Ìåºó£¬Ó¦¸ÃÍ³Ò»É¾³ı
+	/// å®šä¹‰äºŒå‰æ ‘å…ˆå®šä¹‰å¯¹åº”çš„èŠ‚ç‚¹
 	/// </summary>
-	/// <typeparam name="T">½ÚµãµÄÊı¾İÀàĞÍ</typeparam>
+	template<typename T>
+	class BinaryNode : public TopoNode<T, 1, 2>
+	{
+	public:
+		virtual std::unique_ptr<TopoNode<T, 1, 2> > GetLeftChildUnique()
+		{
+			return GetTheIthChildNodeUnique(0);
+		}
+		virtual std::unique_ptr<TopoNode<T, 1, 2> > GetRightChildUnique()
+		{
+			return GetTheIthChildNodeUnique(1);
+		}
+		virtual std::unique_ptr<TopoNode<T, 1, 2> > GetTheParentUnique()
+		{
+			return GetTheIthParentNodeUnique(0);
+		}
+
+		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetLeftChildShared()
+		{
+			return GetTheIthChildNodeShared(0);
+		}
+		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetRightChildShared()
+		{
+			return GetTheIthChildNodeShared(1);
+		}
+		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetTheParentShared()
+		{
+			return GetTheIthParentNodeShared(0);
+		}
+
+		virtual void SetLeftChild(std::unique_ptr<TopoNode<T, 1, 2> >& node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthChildNode(node, 0);
+		}
+		virtual void SetRightChild(std::unique_ptr<TopoNode<T, 1, 2> >& node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthChildNode(node, 1);
+		}
+		virtual void SetTheParent(std::unique_ptr<TopoNode<T, 1, 2> >& node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthParentNode(node, 0);
+		}
+		virtual void SetLeftChild(std::shared_ptr<TopoNode<T, 1, 2> > node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthChildNode(node, 0);
+		}
+		virtual void SetRightChild(std::shared_ptr<TopoNode<T, 1, 2> > node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthChildNode(node, 1);
+		}
+		virtual void SetTheParent(std::shared_ptr<TopoNode<T, 1, 2> > node)
+		{
+			if (node->get() == nullptr)
+				return;
+			SetTheIthParentNode(node, 0);
+		}
+
+	private:
+	};
+
+	/// <summary>
+	/// ä¸ºäº†ç®¡ç†æ ‘å½¢ç»“æ„çš„æŒ‡é’ˆé“¾æ¥ï¼Œä¿è¯èƒ½å¤Ÿæœ‰æ•ˆåœ°åˆ é™¤ï¼Œæ ‘çš„æ‰€æœ‰æŒ‡é’ˆéƒ½åº”è¯¥è¢«ä¿å­˜ï¼Œä¸ä½¿ç”¨è¯¥ç»“æ„ä½“åï¼Œåº”è¯¥ç»Ÿä¸€åˆ é™¤
+	/// </summary>
+	/// <typeparam name="T">èŠ‚ç‚¹çš„æ•°æ®ç±»å‹</typeparam>
 	template<typename T>
 	class BinaryTree
 	{
 	public:
 		BinaryTree(T data)
 		{
-			root = std::make_unique<TopoNode<T, 1, 2> >(false);
+			root = std::make_unique<BinaryNode>(false);
 			root->get()->SetData(data);
+
 			whole_tree.emplace_back(root);
 		}
 		virtual ~BinaryTree() {}
 
-		/*
-		 * ÓĞÁ½¸ö·½Ïò½¨Ê÷
-		 * 1. ¸ø¶¨¹Ì¶¨½Úµãºó£¬¶Ô¹Ì¶¨½ÚµãµÄ¹ØÏµ½øĞĞ¾²Ì¬¹¹½¨
-		 * 2. ÔÚÔöÌí½ÚµãµÄ¹ı³ÌÖĞ£¬¶ÔÒÑÓĞµÄ½á¹¹½øĞĞ¶¯Ì¬¹¹½¨
-		 */
-		
 		/// <summary>
-		/// ¾²Ì¬¹¹½¨
+		/// å•è¾¹åŠ¨æ€æ„å»º
 		/// </summary>
-		virtual void build()
+		/// <param name="current_mod_node">æ­£åœ¨ä¿®æ”¹çš„èŠ‚ç‚¹</param>
+		/// <param name="p_node">åŠ å…¥çš„æ–°èŠ‚ç‚¹</param>
+		virtual bool build(std::unique_ptr<BinaryNode>& current_mod_node, const BinaryNode& node) // å•°å—¦ä¸€å˜´ï¼Œå¦‚æœä¼ å‚æ˜¯æ™ºèƒ½æŒ‡é’ˆï¼Œå¿…é¡»ç”¨å¼•ç”¨æ‰èƒ½ä¿®æ”¹å…¶å†…å­˜
 		{
-
+			if (p_node->get() == nullptr)
+				return false;
+			auto find_result = std::find_if(whole_tree.begin(), whole_tree.end(), &current_mod_node{ // ç”±äºä½¿ç”¨äº†find_ifï¼Œæ‰€ä»¥å¤æ‚åº¦ä¸º1+2+...+N = O(NÂ²)
+				return node.get() == current_mod_node.get();
+			});
+			if (find_result == whole_tree.end())
+				return false;
+			current_mod_node = std::make_unique<BinaryNode>(node);
+			return true;
 		}
-		/// <summary>
-		/// ¶¯Ì¬¹¹½¨
-		/// </summary>
-		/// <param name="node">¼ÓÈëµÄĞÂ½Úµã</param>
-		virtual void build(std::unique_ptr<TopoNode<T, 1, 2> > node)
-		{
 
+		/// <summary>
+		/// å¤šè¾¹åŠ¨æ€æ„å»º
+		/// </summary>
+		/// <param name="current_mod_node">æ­£åœ¨ä¿®æ”¹çš„èŠ‚ç‚¹</param>
+		/// <param name="p_node">åŠ å…¥çš„æ–°èŠ‚ç‚¹</param>
+		/// <returns></returns>
+		virtual bool build(std::shared_ptr<BinaryNode>& current_mod_node, BinaryNode node)
+		{
+			if (p_node->get() == nullptr)
+				return false;
+			auto find_result = std::find_if(whole_tree.begin(), whole_tree.end(), &current_mod_node{ // ç”±äºä½¿ç”¨äº†find_ifï¼Œæ‰€ä»¥å¤æ‚åº¦ä¸º1+2+...+N = O(NÂ²)
+				return node.get() == current_mod_node.get();
+				});
+			if (find_result == whole_tree.end())
+				return false;
+			current_mod_node = std::make_shared<BinaryNode>(node);
+			return true;
 		}
 	private:
-		std::unique_ptr<TopoNode<T, 1, 2> > root;
-		std::vector<TopoNode<T, 1, 2> > whole_tree; // Ö§³ÖÊ÷µÄËùÓĞ½Úµã¿ÉÒÔ±»ÏßĞÔÊı¾İ½á¹¹´æ´¢
+		std::unique_ptr<BinaryNode> root;
+		std::vector<std::unique_ptr<BinaryNode> > whole_tree; // æ”¯æŒæ ‘çš„æ‰€æœ‰èŠ‚ç‚¹å¯ä»¥è¢«çº¿æ€§æ•°æ®ç»“æ„å­˜å‚¨
 	};
 }
 #endif // !Binary_Tree_H
