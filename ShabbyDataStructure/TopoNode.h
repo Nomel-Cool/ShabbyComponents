@@ -27,10 +27,10 @@ namespace shabby
 		/// <summary>
 		/// 如果你确定结构的重边性质就可以手动指定
 		/// </summary>
-		/// <param name="multi_edge">是否重边</param>
-		TopoNode(bool multi_edge)
+		/// <param name="duplicate_edge">是否重边</param>
+		TopoNode(bool duplicate_edge)
 		{
-			if (multi_edge)
+			if (duplicate_edge)
 			{
 				shptr_in.resize(IN_DEGREE);
 				shptr_out.resize(OUT_DEGREE);
@@ -41,6 +41,7 @@ namespace shabby
 				unique_out.resize(OUT_DEGREE);
 			}
 		}
+
 		/// <summary>
 		/// 获取多边有向结构的第i个子节点
 		/// </summary>
@@ -84,8 +85,7 @@ namespace shabby
 		/// <param name="i">单边点容器索引</param>
 		virtual void SetTheIthChildNode(std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& out_node, size_t i)
 		{
-			auto noted_ptr = unique_out.at(i);
-			noted_ptr(std::move(in_node));
+			unique_out.at(i) = std::move(out_node);
 		}
 		/// <summary>
 		/// 设置第i个重边子节点
@@ -94,8 +94,7 @@ namespace shabby
 		/// <param name="i">多边点容器索引</param>
 		virtual void SetTheIthChildNode(std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& out_node, size_t i)
 		{
-			auto noted_ptr = shptr_out.at(i);
-			noted_ptr(std::move(in_node));
+			shptr_out.at(i) = std::move(out_node);
 		}
 		/// <summary>
 		/// 设置第i个单边父节点
@@ -104,8 +103,7 @@ namespace shabby
 		/// <param name="i">单边点容器索引</param>
 		virtual void SetTheIthParentNode(std::unique_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& in_node, size_t i)
 		{
-			auto noted_ptr = unique_in.at(i);
-			noted_ptr(std::move(in_node));
+			unique_in.at(i) = std::move(in_node);
 		}
 		/// <summary>
 		/// 设置第i个重边父节点
@@ -114,8 +112,7 @@ namespace shabby
 		/// <param name="i">重边点容器索引</param>
 		virtual void SetTheIthParentNode(std::shared_ptr<TopoNode<T, IN_DEGREE, OUT_DEGREE> >& in_node, size_t i)
 		{
-			auto noted_ptr = shptr_in.at(i);
-			noted_ptr(std::move(in_node));
+			shptr_in.at(i) = std::move(in_node);
 		}
 		/// <summary>
 		/// 返回节点值引用
