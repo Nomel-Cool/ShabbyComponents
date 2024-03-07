@@ -182,6 +182,9 @@ namespace shabby
 				parent_node->SetRightChild(nulltmp);
 			}
 
+			// 删除父节点的访问节点
+			parent_node = nullptr;
+
 			// 删除左子树
 			auto nulltmpl = std::make_unique<BinaryNode>(nullptr);
 			current_mod_node->SetLeftChild(nulltmpl);
@@ -211,6 +214,9 @@ namespace shabby
 				parent_node->SetRightChild(nulltmp);
 			}
 
+			// 删除父节点的访问节点
+			parent_node = nullptr;
+
 			// 删除左子树
 			auto nulltmpl = std::make_shared<BinaryNode>(nullptr);
 			current_mod_node->SetLeftChild(nulltmpl);
@@ -218,6 +224,129 @@ namespace shabby
 			// 删除右子树
 			auto nulltmpr = std::make_shared<BinaryNode>(nullptr);
 			current_mod_node->SetRightChild(nulltmpr);
+		}
+
+		/// <summary>
+		/// 修改指定节点的左子树
+		/// </summary>
+		/// <param name="current_mod_node">正在修改的节点</param>
+		/// <param name="new_left_child">新的左子树的根</param>
+		/// <returns>返回当前建好的树</returns>
+		virtual std::vector<std::unique_ptr<BinaryNode> >& modify_left_child(std::unique_ptr<BinaryNode>& current_mod_node, BinaryNode& new_left_child)
+		{
+			std::unique_ptr<BinaryNode> p = std::make_unique<BinaryNode>(new_left_child); // 虽然new_left_child是一个引用，但是经过make_unique后是一个新的BinaryNode对象
+			current_mod_node = std::move(p);
+		}
+
+		/// <summary>
+		/// 修改指定节点的右子树
+		/// </summary>
+		/// <param name="current_mod_node">正在修改的节点</param>
+		/// <param name="new_right_child">新的右子树的根</param>
+		/// <returns>返回当前建好的树</returns>
+		virtual std::vector<std::unique_ptr<BinaryNode> >& modify_right_child(std::unique_ptr<BinaryNode>& current_mod_node, BinaryNode& new_right_child)
+		{
+			std::unique_ptr<BinaryNode> p = std::make_unique<BinaryNode>(new_right_child); // 虽然new_right_child是一个引用，但是经过make_unique后是一个新的BinaryNode对象
+			current_mod_node = std::move(p);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		virtual std::vector<BinaryNode> PreorderTraverse()
+		{
+			std::stack<std::unique_ptr<BinaryNode> > sk;
+			std::vector<BinaryNode> v;
+			if (uroot == nullptr)return v;//如果连根都没有，就直接返回空序列
+			sk.push(uroot);//栈的初始化
+			std::unique_ptr<BinaryNode> next;
+			while (!sk.empty())//否则必定起码有一个根节点作为初始节点
+			{
+				next = sk.top();//用临时变量保存弹出的元素
+				v.push_back(next->val);//把弹出元素的内容保存到vector上
+				sk.pop();//真正弹出该元素
+				if (next->right != nullptr)//先压右子树
+					sk.push(next->right);
+				if (next->left != nullptr)//再压左子树
+					sk.push(next->left);
+			}
+			return v;
+		}
+
+		virtual std::vector<BinaryNode> InorderTraverse()
+		{
+			std::stack<TreeNode*> sk;
+			std::vector<BinaryNode> v;
+			if (root == nullptr)return v;
+			sk.push(root);
+			TreeNode* temp = sk.top(), * record = nullptr;
+			while (!sk.empty())//压栈模式
+			{
+				if (temp->left != nullptr)
+				{
+					sk.push(temp->left);
+					temp = temp->left;
+					continue;
+				}
+				while (!sk.empty())//弹栈模式
+				{
+					temp = sk.top();//这句话放在这里，可以免去判断弹栈模式时，弹完了会越界的问题
+					if (temp->right != nullptr)//如果发现回溯过程，回溯到的节点具有右子树，则用break返回到压栈模式。
+					{
+						v.push_back(temp->val);
+						sk.pop();
+						temp = temp->right;
+						sk.push(temp);
+						break;
+					}
+					v.push_back(temp->val);//否则该回溯的节点应该直接输出，再等待下一次的回溯。
+					sk.pop();//pop完之后，下一次的回溯就让temp=新的栈顶了，从而避免了再次往左走。
+				}
+			}
+			return v;
+		}
+
+		virtual std::vector<BinaryNode> PostorderTraverse()
+		{
+			std::stack<TreeNode*> sk, last;
+			std::vector<BinaryNode> v;
+			if (root == nullptr)return v;
+			sk.push(root);
+			last.push(nullptr);//设置一个保存转折点的栈，用于回溯时提供证据，因为如果不提供则会在转折点上产生死循环，且初始化一定是空指针
+			TreeNode* temp = sk.top();
+			while (!sk.empty())
+			{
+				if (temp->left != nullptr)
+				{
+					sk.push(temp->left);
+					temp = temp->left;
+					continue;
+				}
+				while (!sk.empty())
+				{
+					temp = sk.top();//第一个要弹出的肯定是已经搜索过的
+					if (last.top() == temp)//如果会回溯到转折点，直接弹出，返回到转折点上的单偏树继续进行回溯
+					{
+						v.push_back(temp->val);
+						sk.pop();
+						last.pop();
+						continue;
+					}
+					if (temp->right != nullptr)
+					{
+						/*v.push_back(temp->val);*/
+						/*sk.pop();///这句说明了后序遍历和中序遍历的差别就在转折元素上*/
+						last.push(temp);//保存转折点
+						temp = temp->right;
+						sk.push(temp);
+						break;
+					}
+					v.push_back(temp->val);
+					sk.pop();
+				}
+			}
+			return v;
 		}
 
 	private:
