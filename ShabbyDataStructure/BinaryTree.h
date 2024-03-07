@@ -4,6 +4,7 @@
 
 #include <stack>
 #include <vector>
+#include <queue>
 
 #include "../ShabbyUniversalType/QuestType.h"
 #include "TopoNode.h"
@@ -68,18 +69,10 @@ namespace shabby
 	class BinaryTree
 	{
 	public:
-		BinaryTree(BinaryNode data, bool duplicate_edge) :edge_type(duplicate_edge)
+		BinaryTree(BinaryNode<T> data)
 		{
-			if (duplicate_edge)
-			{
-				sroot = std::make_shared<BinaryNode>(data, duplicate_edge);
-				swhole_tree.emplace_back(sroot);
-			}
-			else
-			{
-				uroot = std::make_unique<BinaryNode>(data, duplicate_edge);
-				uwhole_tree.emplace_back(uroot);
-			}
+			sroot = std::make_shared<BinaryNode<T> >(data);
+			swhole_tree.emplace_back(sroot);
 		}
 		virtual ~BinaryTree() {}
 		
@@ -90,16 +83,16 @@ namespace shabby
 		/// <param name="current_mod_node">正在修改的节点</param>
 		/// <param name="node">加入的新节点</param>
 		/// <returns>返回当前建好的树，如果加入的节点的边属性不匹配则返回空容器</returns>
-		virtual std::vector<std::shared_ptr<BinaryNode> >& insert(std::shared_ptr<BinaryNode>& current_mod_node, const BinaryNode& node)
+		virtual std::vector<std::shared_ptr<BinaryNode> >& insert(std::shared_ptr<BinaryNode<T> >& current_mod_node, const BinaryNode<T>& node)
 		{
 			if (!node.GetEdgeType())
-				return std::vector<std::shared_ptr<BinaryNode> >();
+				return std::vector<std::shared_ptr<BinaryNode<T> > >();
 			auto find_result = std::find_if(swhole_tree.begin(), swhole_tree.end(), &current_mod_node{ // 由于使用了find_if，所以复杂度为1+2+...+N = O(N²)
-				return std::vector<std::shared_ptr<BinaryNode> >();
+				return std::vector<std::shared_ptr<BinaryNode<T> > >();
 				});
 			if (find_result == swhole_tree.end())
-				return std::vector<std::shared_ptr<BinaryNode> >();
-			current_mod_node = std::make_shared<BinaryNode>(node);
+				return std::vector<std::shared_ptr<BinaryNode<T> > >();
+			current_mod_node = std::make_shared<BinaryNode<T> >(node);
 			return swhole_tree;
 		}
 
@@ -108,18 +101,18 @@ namespace shabby
 		/// </summary>
 		/// <param name="current_mod_node">正在修改的节点</param>
 		/// <returns>返回当前建好的树</returns>
-		virtual std::vector<std::shared_ptr<BinaryNode> >& del(std::shared_ptr<BinaryNode>& current_mod_node)
+		virtual std::vector<std::shared_ptr<BinaryNode<T> > >& del(std::shared_ptr<BinaryNode<T> >& current_mod_node)
 		{
 			// 操作其父节点删除它自己
 			auto parent_node = current_mod_node->GetTheParentUnique();
 			if (parent_node->GetLeftChild() == current_mod_node)
 			{
-				auto nulltmp = std::make_shared<BinaryNode>(nullptr);
+				auto nulltmp = std::make_shared<BinaryNode<T> >(nullptr);
 				parent_node->SetLeftChild(nulltmp);
 			}
 			else if (parent_node->GetRightChild() == current_mod_node)
 			{
-				auto nulltmp = std::make_shared<BinaryNode>(nullptr);
+				auto nulltmp = std::make_shared<BinaryNode<T> >(nullptr);
 				parent_node->SetRightChild(nulltmp);
 			}
 
@@ -127,11 +120,11 @@ namespace shabby
 			parent_node = nullptr;
 
 			// 删除左子树
-			auto nulltmpl = std::make_shared<BinaryNode>(nullptr);
+			auto nulltmpl = std::make_shared<BinaryNode<T> >(nullptr);
 			current_mod_node->SetLeftChild(nulltmpl);
 
 			// 删除右子树
-			auto nulltmpr = std::make_shared<BinaryNode>(nullptr);
+			auto nulltmpr = std::make_shared<BinaryNode<T> >(nullptr);
 			current_mod_node->SetRightChild(nulltmpr);
 		}
 
@@ -139,13 +132,13 @@ namespace shabby
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		virtual std::vector<BinaryNode> PreorderTraverse()
+		virtual std::vector<BinaryNode<T> > PreorderTraverse()
 		{
-			std::stack<std::shared_ptr<BinaryNode> > sk;
-			std::vector<BinaryNode> v;
+			std::stack<std::shared_ptr<BinaryNode<T> > > sk;
+			std::vector<BinaryNode<T> > v;
 			if (uroot == nullptr)return v;//如果连根都没有，就直接返回空序列
 			sk.push(uroot);//栈的初始化
-			std::shared_ptr<BinaryNode> next;
+			std::shared_ptr<BinaryNode<T> > next;
 			while (!sk.empty())//否则必定起码有一个根节点作为初始节点
 			{
 				next = sk.top();//用临时变量保存弹出的元素
@@ -159,13 +152,13 @@ namespace shabby
 			return v;
 		}
 
-		virtual std::vector<BinaryNode> InorderTraverse()
+		virtual std::vector<BinaryNode<T> > InorderTraverse()
 		{
-			std::stack<std::shared_ptr<BinaryNode>> sk;
-			std::vector<BinaryNode> v;
+			std::stack<std::shared_ptr<BinaryNode<T> > > sk;
+			std::vector<BinaryNode<T> > v;
 			if (sroot == nullptr)return v;
 			sk.push(sroot);
-			std::shared_ptr<BinaryNode> temp = sk.top(), record = nullptr;
+			std::shared_ptr<BinaryNode<T> > temp = sk.top(), record = nullptr;
 			while (!sk.empty())//压栈模式
 			{
 				if (temp->GetLeftChild() != nullptr)
@@ -192,14 +185,14 @@ namespace shabby
 			return v;
 		}
 
-		virtual std::vector<BinaryNode> PostorderTraverse()
+		virtual std::vector<BinaryNode<T> > PostorderTraverse()
 		{
-			std::stack<std::shared_ptr<BinaryNode> > sk, last;
-			std::vector<BinaryNode> v;
+			std::stack<std::shared_ptr<BinaryNode<T> > > sk, last;
+			std::vector<BinaryNode<T> > v;
 			if (sroot == nullptr)return v;
 			sk.push(sroot);
 			last.push(nullptr);//设置一个保存转折点的栈，用于回溯时提供证据，因为如果不提供则会在转折点上产生死循环，且初始化一定是空指针
-			std::shared_ptr<BinaryNode> temp = sk.top();
+			std::shared_ptr<BinaryNode<T> > temp = sk.top();
 			while (!sk.empty())
 			{
 				if (temp->GetLeftChild() != nullptr)
@@ -234,9 +227,40 @@ namespace shabby
 			return v;
 		}
 
+		std::vector<BinaryNode<T> > levelOrder(std::shared_ptr<BinaryNode<T> > root) {
+			std::queue<std::shared_ptr<BinaryNode<T> > > q;
+			std::vector<BinaryNode<T> > v;
+			if (root == nullptr)return v;
+			q.push(root);
+			while (!q.empty())
+			{
+				v.push_back(q.front()->GetData());
+				if (q.front()->GetLeftChild() != nullptr)
+					q.push(q.front()->GetLeftChild());
+				if (q.front()->GetRightChild() != nullptr)
+					q.push(q.front()->GetRightChild());
+				q.pop();
+			}
+			return v;
+		}
+
 	private:
-		std::shared_ptr<BinaryNode> sroot;
-		std::vector<std::shared_ptr<BinaryNode> > swhole_tree; // 支持树的所有节点可以被线性数据结构存储
+		std::shared_ptr<BinaryNode<T> > sroot;
+		std::vector<std::shared_ptr<BinaryNode<T> > > swhole_tree; // 支持树的所有节点可以被线性数据结构存储
+	};
+
+	/// <summary>
+	/// 平衡二叉树
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	template<typename T>
+	class AVLTree : public BinaryTree<T>
+	{
+	public:
+		AVLTree(BinaryNode<T>  data) :BinaryTree<T>(data) {}
+
+	private:
+
 	};
 }
 #endif // !Binary_Tree_H
