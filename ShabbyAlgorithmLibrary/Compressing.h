@@ -14,14 +14,9 @@
 #include <iostream>
 namespace shabby
 {
-	class Compressing
-	{
-	public:
-		Compressing() {}
-		virtual ~Compressing(){}
-	private:
-	};
-
+	/// <summary>
+	/// 哈夫曼树节点构造，保存字符、使用频率，以及对应的文本材料下的haffuman编码
+	/// </summary>
 	class HuffmanTreeNodeForm
 	{
 	public:
@@ -34,29 +29,33 @@ namespace shabby
 			return freq > other.freq;
 		}
 	};
+
 	/// <summary>
-	/// 文本哈夫曼编码
+	/// 文本哈夫曼编码，本质是一棵二叉树
 	/// </summary>
-	class TextHuffmanCompressing : public Compressing
+	class TextHuffmanCompressing : public BinaryTree<BinaryNode<HuffmanTreeNodeForm> >
 	{
 	public:
 		TextHuffmanCompressing()
 		{
 			ASCII_Frequency.resize(127, 0);
 		}
+
 		virtual ~TextHuffmanCompressing() {}
+
 		/// <summary>
 		/// 重置算法缓存
 		/// </summary>
 		virtual void ResetCache()
 		{
 			// 清空缓冲，等待复用（由于priority_queue没有clear函数）
-			std::priority_queue<TreeNode<HuffmanTreeNodeForm>*,
-				std::vector<TreeNode<HuffmanTreeNodeForm>*>,
-				std::greater<TreeNode<HuffmanTreeNodeForm>*>> empty_pq;
+			std::priority_queue<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> >,
+				std::vector<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > >,
+				std::greater<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > > > empty_pq;
 			frequency_queue.swap(empty_pq);
 			ASCII_Frequency.clear();
 		}
+
 		/// <summary>
 		/// 求取对应的哈夫曼压缩字符串
 		/// </summary>
@@ -95,6 +94,7 @@ namespace shabby
 				compressed_code += temp_char;
 			return compressed_code;
 		}
+
 		virtual uint32_t CalWeight() { return 0; }
 	protected:
 		/// <summary>
@@ -112,31 +112,31 @@ namespace shabby
 			{
 				// 设置左节点
 				auto left_value = frequency_queue.top();
-				TreeNode<HuffmanTreeNodeForm>* left = left_value;
+				std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > left = std::make_shared<BinaryNode<HuffmanTreeNodeForm> >(left_value);
 				frequency_queue.pop();
 
 				// 设置右节点
 				auto right_value = frequency_queue.top();
-				TreeNode<HuffmanTreeNodeForm>* right = right_value;
+				std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > right = std::make_shared<BinaryNode<HuffmanTreeNodeForm> >(right_value);
 				frequency_queue.pop();
 
 				// 设置父节点
 				HuffmanTreeNodeForm parent_value;
 				parent_value.origin_char = left->GetData().origin_char + right->GetData().origin_char;
 				parent_value.freq = left->GetData().freq + right->GetData().freq;
-				TreeNode<HuffmanTreeNodeForm>* parent = new TreeNode<HuffmanTreeNodeForm>();
+				std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > parent = std::make_shared<BinaryNode<HuffmanTreeNodeForm> >();
 				parent->SetData(parent_value);
-				parent->SetParentNode(parent);
+				parent->SetTheParent(parent);
 				parent->SetLeftChild(left);
 				parent->SetRightChild(right);
 
 				// 设置父子关系
-				left->SetParentNode(parent);
-				right->SetParentNode(parent);
+				left->SetTheParent(parent);
+				right->SetTheParent(parent);
 
 				// 建树
-				m_huffman_tree.BuildByAdding(left);
-				m_huffman_tree.BuildByAdding(right);
+				m_huffman_tree.insert(*left);
+				m_huffman_tree.insert(*right);
 
 				// 父节点重新入队
 				frequency_queue.push(parent);
@@ -153,15 +153,16 @@ namespace shabby
 		virtual void GetHuffmanMap()
 		{
 			std::unordered_map<std::string, HuffmanTreeNodeForm> huffman_dictionary;
-			for (auto& node : m_huffman_tree.m_tree)
+			auto tree_struct = m_huffman_tree.GetTreeStruct();
+			for (auto& node : tree_struct)
 			{
 				if (node->GetLeftChild() == nullptr && node->GetRightChild() == nullptr)
 				{
 					auto r_data = node->GetData(); // 保存叶子节点数据副本
-					while (node != node->GetParentNode())
+					while (node != node->GetTheParent())
 					{
-						auto _left = node->GetParentNode()->GetLeftChild();
-						auto _right = node->GetParentNode()->GetRightChild();
+						auto _left = node->GetTheParent()->GetLeftChild();
+						auto _right = node->GetTheParent()->GetRightChild();
 						if (_left == node)
 						{
 							r_data.huffman_code.push_back(false);
@@ -170,7 +171,7 @@ namespace shabby
 						{
 							r_data.huffman_code.push_back(true);
 						}
-						node = node->GetParentNode();
+						node = node->GetTheParent();
 					}
 					huffman_dictionary.insert(std::pair<std::string, HuffmanTreeNodeForm>(r_data.origin_char, r_data));
 				}
@@ -198,7 +199,7 @@ namespace shabby
 					HuffmanTreeNodeForm value;
 					value.freq = ASCII_Frequency[j];
 					value.origin_char = std::string(1, (char)j);
-					TreeNode<HuffmanTreeNodeForm>* node = new TreeNode<HuffmanTreeNodeForm>();
+					std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > node = std::make_shared<BinaryNode<HuffmanTreeNodeForm> >();
 					node->SetData(value);
 					frequency_queue.push(node);
 				}
@@ -206,9 +207,9 @@ namespace shabby
 		}
 
 		std::vector<uint32_t> ASCII_Frequency; //ASCII码编码
-		std::priority_queue<TreeNode<HuffmanTreeNodeForm>*,
-			std::vector<TreeNode<HuffmanTreeNodeForm>*>,
-			std::greater<TreeNode<HuffmanTreeNodeForm>*>> frequency_queue;
+		std::priority_queue<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> >,
+			std::vector<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > >,
+			std::greater<std::shared_ptr<BinaryNode<HuffmanTreeNodeForm> > > > frequency_queue;
 	private:
 		BinaryTree<HuffmanTreeNodeForm> m_huffman_tree;
 		std::unordered_map<std::string, HuffmanTreeNodeForm> m_huffman_dictionary;
