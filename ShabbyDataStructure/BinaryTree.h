@@ -22,32 +22,32 @@ namespace shabby
 		BinaryNode() : TopoNode<T, 1, 2>() {}
 
 		/* 啰嗦一嘴：由于RVO机制，GetTheParent并不会使得返回的指针发生拷贝从而违反Uniqueptr唯一性或者引起Sharedptr引用计数增加 */
-		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetLeftChild()
+		virtual std::shared_ptr<BinaryNode<T> > GetLeftChild()
 		{
 			return GetTheIthChildNodeShared(0);
 		}
-		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetRightChild()
+		virtual std::shared_ptr<BinaryNode<T> > GetRightChild()
 		{
 			return GetTheIthChildNodeShared(1);
 		}
-		virtual std::shared_ptr<TopoNode<T, 1, 2> > GetTheParent()
+		virtual std::shared_ptr<BinaryNode<T> > GetTheParent()
 		{
 			return GetTheIthParentNodeShared(0);
 		}
 
-		virtual void SetLeftChild(std::shared_ptr<TopoNode<T, 1, 2> >& node)
+		virtual void SetLeftChild(std::shared_ptr<BinaryNode<T> >& node)
 		{
 			if (node->get() == nullptr)
 				return;
 			SetTheIthChildNode(node, 0);
 		}
-		virtual void SetRightChild(std::shared_ptr<TopoNode<T, 1, 2> >& node)
+		virtual void SetRightChild(std::shared_ptr<BinaryNode<T> >& node)
 		{
 			if (node->get() == nullptr)
 				return;
 			SetTheIthChildNode(node, 1);
 		}
-		virtual void SetTheParent(std::shared_ptr<TopoNode<T, 1, 2> >& node)
+		virtual void SetTheParent(std::shared_ptr<BinaryNode<T> >& node)
 		{
 			if (node->get() == nullptr)
 				return;
@@ -69,6 +69,10 @@ namespace shabby
 	class BinaryTree
 	{
 	public:
+		BinaryTree()
+		{
+			sroot = nullptr;
+		}
 		BinaryTree(BinaryNode<T> data)
 		{
 			sroot = std::make_shared<BinaryNode<T> >(data);
