@@ -86,7 +86,7 @@ namespace shabby
 				sroot = p_root;
 		}
 
-		virtual std::vector<std::shared_ptr<BinaryNode<T> > > GetTreeStruct()
+		virtual std::vector<std::shared_ptr<BinaryNode<T> > >& AccessTreeStruct()
 		{
 			return swhole_tree;
 		}
@@ -245,7 +245,7 @@ namespace shabby
 			return v;
 		}
 
-		std::vector<BinaryNode<T> > levelOrder(std::shared_ptr<BinaryNode<T> > root) {
+		std::vector<BinaryNode<T> > LevelOrder(std::shared_ptr<BinaryNode<T> > root) {
 			std::queue<std::shared_ptr<BinaryNode<T> > > q;
 			std::vector<BinaryNode<T> > v;
 			if (root == nullptr)return v;
@@ -268,7 +268,7 @@ namespace shabby
 	};
 
 	/// <summary>
-	/// 平衡二叉树
+	/// 平衡二叉树，与普通二叉树最大的区别在于树高的平衡
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	template<typename T>
@@ -277,6 +277,15 @@ namespace shabby
 	public:
 		AVLTree(BinaryNode<T>  data) :BinaryTree<T>(data) {}
 
+		/// <summary>
+		/// 通过重载插入时增加平衡检测和调整的操作实现
+		/// </summary>
+		/// <param name="node">新增的节点</param>
+		/// <returns></returns>
+		virtual virtual std::vector<std::shared_ptr<BinaryNode> >& insert(const BinaryNode<T>& node) override
+		{
+
+		}
 	private:
 
 	};
