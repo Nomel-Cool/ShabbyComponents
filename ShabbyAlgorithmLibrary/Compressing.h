@@ -98,10 +98,10 @@ namespace shabby
 		virtual uint32_t CalWeight() { return 0; }
 	protected:
 		/// <summary>
-/// 从已有的字符文本建立哈夫曼树
-/// </summary>
-/// <param name="text">字符文本</param>
-/// <returns>哈夫曼二叉树</returns>
+		/// 从已有的字符文本建立哈夫曼树
+		/// </summary>
+		/// <param name="text">字符文本</param>
+		/// <returns>哈夫曼二叉树</returns>
 		virtual void BuildHuffmanTree(std::string text)
 		{
 			// 获取文本频率
@@ -153,7 +153,7 @@ namespace shabby
 		virtual void GetHuffmanMap()
 		{
 			std::unordered_map<std::string, HuffmanTreeNodeForm> huffman_dictionary;
-			auto tree_struct = m_huffman_tree.GetTreeStruct();
+			auto tree_struct = m_huffman_tree.AccessTreeStruct();
 			for (auto& node : tree_struct)
 			{
 				if (node->GetLeftChild() == nullptr && node->GetRightChild() == nullptr)
