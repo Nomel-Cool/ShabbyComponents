@@ -17,6 +17,7 @@ public:
 		if (!isLegal)
 			return false;
 		json_obj = json::parse(json_string.c_str());
+		return true;
 	}
 	std::string Serialize(const json& json_obj)
 	{ 
