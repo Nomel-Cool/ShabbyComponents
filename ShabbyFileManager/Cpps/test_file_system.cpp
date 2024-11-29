@@ -1,4 +1,10 @@
+#include <functional>
+#include <iostream>
 #include "FileManager.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
+
 class SingleAutomata {
 public:
     std::string id;
@@ -11,8 +17,12 @@ class GraphModel {
 public:
     std::string model_name;
     std::vector<SingleAutomata> automatas;
+};
 
-    bool FillUp(const std::string& json_string) {
+class ForCallBack
+{
+public:
+    bool FillUp(const std::string& json_string, GraphModel& graph_model) {
         json json_obj;
         if (!file_manager.GetJsonParser().DeSerialize(json_string, json_obj)) {
             std::cerr << "Failed to parse JSON: " << json_string << std::endl;
@@ -23,7 +33,7 @@ public:
         case State::WaitingForModel:
             if (json_obj.contains("model")) {
                 current_state = State::ReadingModelName;
-                return FillUp(json_string); // Re-process this JSON string in the new state
+                return FillUp(json_string, graph_model);
             }
             break;
         case State::ReadingModelName:
@@ -31,7 +41,7 @@ public:
                 for (int i = 0; i < json_obj["model"].size(); ++i)
                     if (json_obj["model"][i].contains("name"))
                     {
-                        model_name = json_obj["model"][i]["name"];
+                        graph_model.model_name = json_obj["model"][i]["name"];
                         break;
                     }
             current_state = State::WaitingForAutomata;
@@ -39,8 +49,8 @@ public:
         case State::WaitingForAutomata:
             if (json_obj.contains("automata")) {
                 current_state = State::ReadingAutomataId;
-                automatas.emplace_back();
-                return FillUp(json_string); // Re-process this JSON string in the new state
+                graph_model.automatas.emplace_back();
+                return FillUp(json_string, graph_model);
             }
             break;
         case State::ReadingAutomataId:
@@ -48,7 +58,7 @@ public:
                 for (int i = 0; i < json_obj["automata"].size(); ++i)
                     if (json_obj["automata"][i].contains("id"))
                     {
-                        automatas.back().id = json_obj["automata"][i]["id"];
+                        graph_model.automatas.back().id = json_obj["automata"][i]["id"];
                         break;
                     }
             current_state = State::ReadingInitStatus;
@@ -58,7 +68,7 @@ public:
                 for (int i = 0; i < json_obj["init_status"].size(); ++i)
                     if (json_obj["init_status"][i].contains("param"))
                     {
-                        automatas.back().init_status = json_obj["init_status"][i]["param"];
+                        graph_model.automatas.back().init_status = json_obj["init_status"][i]["param"];
                         break;
                     }
             current_state = State::ReadingTransferFunction;
@@ -68,7 +78,7 @@ public:
                 for (int i = 0; i < json_obj["transfer_function"].size(); ++i)
                     if (json_obj["transfer_function"][i].contains("func"))
                     {
-                        automatas.back().transfer_function = json_obj["transfer_function"][i]["func"];
+                        graph_model.automatas.back().transfer_function = json_obj["transfer_function"][i]["func"];
                         break;
                     }
             current_state = State::ReadingTerminateSet;
@@ -78,7 +88,7 @@ public:
                 for (int i = 0; i < json_obj["terminate_set"].size(); ++i)
                     if (json_obj["terminate_set"][i].contains("set"))
                     {
-                        automatas.back().terminate_set = json_obj["terminate_set"][i]["set"];
+                        graph_model.automatas.back().terminate_set = json_obj["terminate_set"][i]["set"];
                         break;
                     }
             current_state = State::WaitingForAutomata;
@@ -108,7 +118,15 @@ int main()
 {
     FileManager fm;
     GraphModel gm;
-    auto traverse_result = fm.TransXml2Class("./Resources/segment_automata.xml", gm);
+    ForCallBack callback;
+
+    auto bound_func = std::bind(&ForCallBack::FillUp, &callback, std::placeholders::_1, std::placeholders::_2);
+    bool traverse_result = fm.TransXml2Class<GraphModel>("./Resources/segment_automata.xml", gm, bound_func);
+
+    if (!traverse_result) {
+        std::cerr << "Failed to traverse XML to class." << std::endl;
+    }
     int i = 0;
     return 0;
 }
+
