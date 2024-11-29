@@ -108,7 +108,7 @@ int main()
 {
     FileManager fm;
     GraphModel gm;
-    auto traverse_result = fm.TransXml2Class("segment_automata.xml", gm);
+    auto traverse_result = fm.TransXml2Class("./Resources/segment_automata.xml", gm);
     int i = 0;
     return 0;
 }
