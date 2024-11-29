@@ -1,0 +1,7 @@
+<model name="BasicSegment">
+	<automata id="1">
+		<init_status param="abc"/>
+		<transfer_function func="BresenhamLine"/>
+		<terminate_set set="def"/>
+	</automata>
+</model>
