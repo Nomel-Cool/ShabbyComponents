@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <string>
 #include "XMLParser.h"
+#include "JSONParser.h"
 
 /// <summary>
 /// 封装filesystem库，用于
@@ -26,32 +27,35 @@ public:
 	/// <param name="xml_path">xml文件的路径</param>
 	/// <param name="target_obj">可序列化类的实例</param>
 	/// <returns>反序列化成功target_obj被填充为true，否则false</returns>
-	template<typename StructuringClass>
-	bool TransXml2Class(std::string xml_path, StructuringClass& target_obj)
-	{
-		auto deserialized_data = DeSerialize(xml_path, target_obj);
-		if (!deserialized_data.empty())
-			try
-			{
-				if constexpr (std::is_invocable_v<decltype(&StructuringClass::FillUp), StructuringClass, std::string>)
-					for (const auto& [element, attributes] : deserialized_data)
-					{
-						target_obj.FillUp(element);
-						for (const auto& [attr, value] : attributes)
-						{
-							target_obj.FillUp(attr);
-							target_obj.FillUp(value);
-						}
-					}
-				else
-					throw std::logic_error("The class does not implement the required FillUp(std::string) function.");
-				return true;
-			}
-		std::cerr << "DeSerialization failed or returned empty data." << std::endl;
-		return false;
-	}
+    template<typename StructuringClass>
+    bool TransXml2Class(std::string xml_path, StructuringClass& target_obj)
+    {
+        auto deserialized_data = xml_parser.DeSerialize(xml_path);
+        if (!deserialized_data.empty())
+        {
+            try {
+                if constexpr (std::is_invocable_v<decltype(&StructuringClass::FillUp), StructuringClass, std::string>)
+                    for (const auto& json_string : deserialized_data)
+                        target_obj.FillUp(json_string);
+                else
+                    throw std::logic_error("The class does not implement the required FillUp(std::string) function.");
+                return true;
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Exception occurred: " << e.what() << std::endl;
+                return false;
+            }
+        }
+        else
+        {
+            std::cerr << "DeSerialization failed or returned empty data." << std::endl;
+            return false;
+        }
+    }
+
 private:
 	XmlParser xml_parser;
+    JsonParser json_parser;
 };
 
 #endif
