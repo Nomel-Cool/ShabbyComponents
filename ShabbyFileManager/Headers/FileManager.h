@@ -16,7 +16,10 @@ class FileManager
 {
 public:
 	FileManager() {}
-
+    JsonParser GetJsonParser()
+    {
+        return json_parser;
+    }
 	/// <summary>
 	/// XML反序列化为类始终是会需要一些代价的，DeSerialize函数通过map存储关注的string字段（详见DeSerialize说明）
 	/// 从而使得XML可以利用处理string字段来与其它类沟通
