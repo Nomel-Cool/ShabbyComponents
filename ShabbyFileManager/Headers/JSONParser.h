@@ -12,14 +12,13 @@ class JsonParser
 public:
 	virtual bool DeSerialize(std::string json_string, json& json_obj)
 	{
-		// check the string wether a legal json formation by using json::... I forgot
 		bool isLegal = json::accept(json_string);
 		if (!isLegal)
 			return false;
 		json_obj = json::parse(json_string.c_str());
 		return true;
 	}
-	std::string Serialize(const json& json_obj)
+	virtual std::string Serialize(const json& json_obj)
 	{ 
 		try { 
 			return json_obj.dump();
