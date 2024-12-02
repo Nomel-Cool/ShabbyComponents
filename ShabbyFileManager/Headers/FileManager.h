@@ -1,4 +1,5 @@
 #pragma once
+
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
@@ -10,7 +11,7 @@
 #include "XMLParser.h"
 #include "JSONParser.h"
 
-class FileManager
+class  FileManager
 {
 public:
     FileManager() {}

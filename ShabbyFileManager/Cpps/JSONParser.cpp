@@ -19,29 +19,3 @@ std::string JsonParser::Serialize(const json& json_obj)
 		return "";
 	}
 }
-
-template<typename T>
-T JsonParser::GetValue(const json& json_obj, const std::string& key)
-{
-	try {
-		return json_obj.at(key).get<T>();
-	}
-	catch (json::out_of_range& e) {
-		std::cerr << "Key not found: " << key << std::endl;
-		throw;
-	}
-	catch (json::type_error& e) {
-		std::cerr << "Type error for key: " << key << std::endl; throw;
-	}
-}
-
-template<typename T>
-void JsonParser::SetValue(json& json_obj, const std::string& key, const T& value)
-{
-	try {
-		json_obj[key] = value;
-	}
-	catch (const std::exception& e) {
-		std::cerr << "Failed to set value: " << e.what() << std::endl;
-	}
-}
