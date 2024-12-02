@@ -18,9 +18,6 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\FileManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -33,16 +30,22 @@
     <ClInclude Include="Headers\XMLParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\json_fwd.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_file_system.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Cpps\test_file_system.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Cpps\tinyxml2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\segment_automata.xml" />
   </ItemGroup>
 </Project>

@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>F:\WorkPlace\VS\ShabbyComponents\ShabbyFileManager\Headers;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -104,6 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,16 +134,19 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileManager.h" />
     <ClInclude Include="Headers\FileManager.h" />
+    <ClInclude Include="Headers\json.hpp" />
     <ClInclude Include="Headers\JSONParser.h" />
+    <ClInclude Include="Headers\json_fwd.hpp" />
     <ClInclude Include="Headers\tinyxml2.h" />
     <ClInclude Include="Headers\XMLParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cpps\test_file_system.cpp" />
     <ClCompile Include="Cpps\tinyxml2.cpp" />
-    <ClCompile Include="test_file_system.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\segment_automata.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
