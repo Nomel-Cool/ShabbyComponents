@@ -144,7 +144,6 @@
     <ClInclude Include="Headers\XMLParser.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cpps\dLL.cpp" />
     <ClCompile Include="Cpps\FileManager.cpp" />
     <ClCompile Include="Cpps\JSONParser.cpp" />
     <ClCompile Include="Cpps\test_file_system.cpp" />

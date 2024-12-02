@@ -56,9 +56,6 @@
     <ClCompile Include="Cpps\XMLParser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Cpps\dLL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Resources\segment_automata.xml" />

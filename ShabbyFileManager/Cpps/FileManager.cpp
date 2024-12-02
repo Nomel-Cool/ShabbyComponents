@@ -1,7 +1,10 @@
 #include "FileManager.h"
 
-JsonParser FileManager::GetJsonParser()
+bool FileManager::TransStr2JsonObject(const std::string& json_string, json& json_obj)
 {
-    return json_parser;
+	if (json::accept(json_string))
+		json_obj = json::parse(json_string);
+	else
+		std::cerr << "Invalid Json string formation" << std::endl;
 }
 
