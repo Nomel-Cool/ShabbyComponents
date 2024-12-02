@@ -14,10 +14,7 @@ class FileManager
 {
 public:
     FileManager() {}
-    JsonParser GetJsonParser()
-    {
-        return json_parser;
-    }
+    JsonParser GetJsonParser();
 
     template<typename StructuringClass>
     bool TransXml2Class(const std::string& xml_path, StructuringClass& target_obj, std::function<bool(const std::string&, StructuringClass&)> FillUp)
@@ -41,7 +38,6 @@ public:
             return false;
         }
     }
-
 private:
     XmlParser xml_parser;
     JsonParser json_parser;
