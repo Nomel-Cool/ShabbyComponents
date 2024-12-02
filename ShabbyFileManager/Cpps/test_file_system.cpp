@@ -24,7 +24,7 @@ class ForCallBack
 public:
     bool FillUp(const std::string& json_string, GraphModel& graph_model) {
         json json_obj;
-        if (!file_manager.GetJsonParser().DeSerialize(json_string, json_obj)) {
+        if (!file_manager.TransStr2JsonObject(json_string, json_obj)) {
             std::cerr << "Failed to parse JSON: " << json_string << std::endl;
             return false;
         }
