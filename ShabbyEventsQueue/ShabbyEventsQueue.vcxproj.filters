@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EventsQueue.h">
+    <ClInclude Include="Headers\EventsQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mq_test.cpp">
+    <ClCompile Include="Cpps\mq_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
