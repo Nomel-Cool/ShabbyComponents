@@ -1,6 +1,5 @@
 #include <iostream>
-#include <future>
-#include "ShabbyThreadPool.h"
+#include "ThreadPool.h"
 
 void exampleTask(int n) {
     std::cout << "Task executed with value: " << n << " by thread " << std::this_thread::get_id() << std::endl;
