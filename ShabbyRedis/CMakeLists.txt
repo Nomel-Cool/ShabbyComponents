@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(ShabbyRedis)
 
+# 设置 C++ 标准为C++20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # 设置生成 DLL 的选项
 set(BUILD_SHARED_LIBS ON)
 

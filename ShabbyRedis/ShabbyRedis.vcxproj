@@ -141,6 +141,7 @@
     <ClInclude Include="Headers\sds.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cpps\RedisClient.cpp" />
     <ClCompile Include="Cpps\test_redis_connect.cpp" />
   </ItemGroup>
   <ItemGroup>

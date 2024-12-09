@@ -1,5 +1,20 @@
 #include "RedisClient.h"
 
+RedisClient::RedisClient()
+{
+	context = redisConnect("127.0.0.1", 6379);
+    if (context == nullptr || context->err) {
+        if (context) {
+            std::cerr << "Connection error: " << context->errstr << std::endl;
+            redisFree(context);
+        }
+        else {
+            std::cerr << "Default connection error: can't allocate redis context" << std::endl;
+        }
+        exit(1);
+    }
+}
+
 RedisClient::RedisClient(const std::string& host, int port)
 {
     context = redisConnect(host.c_str(), port);
@@ -9,7 +24,7 @@ RedisClient::RedisClient(const std::string& host, int port)
             redisFree(context);
         }
         else {
-            std::cerr << "Connection error: can't allocate redis context" << std::endl;
+            std::cerr << "Specific connection error: can't allocate redis context" << std::endl;
         }
         exit(1);
     }
