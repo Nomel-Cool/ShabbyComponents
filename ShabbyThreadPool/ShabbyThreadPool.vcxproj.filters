@@ -21,12 +21,18 @@
     <ClInclude Include="Headers\EventsQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\ThreadPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cpps\thread_pool_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Cpps\ShabbyThreadPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Cpps\ThreadPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

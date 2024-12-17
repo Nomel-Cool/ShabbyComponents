@@ -30,6 +30,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyFileManager", "..\Sha
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyRedis", "..\ShabbyRedis\ShabbyRedis.vcxproj", "{AD69D893-AB13-4D2D-A794-76DFD3D56591}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShabbyDataBase", "..\ShabbyDataBase\ShabbyDataBase.vcxproj", "{24757372-000E-4FF3-816B-CA6C8D8AAE5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -102,6 +104,14 @@ Global
 		{AD69D893-AB13-4D2D-A794-76DFD3D56591}.Release|x64.Build.0 = Release|x64
 		{AD69D893-AB13-4D2D-A794-76DFD3D56591}.Release|x86.ActiveCfg = Release|Win32
 		{AD69D893-AB13-4D2D-A794-76DFD3D56591}.Release|x86.Build.0 = Release|Win32
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Debug|x64.ActiveCfg = Debug|x64
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Debug|x64.Build.0 = Debug|x64
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Debug|x86.ActiveCfg = Debug|Win32
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Debug|x86.Build.0 = Debug|Win32
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Release|x64.ActiveCfg = Release|x64
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Release|x64.Build.0 = Release|x64
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Release|x86.ActiveCfg = Release|Win32
+		{24757372-000E-4FF3-816B-CA6C8D8AAE5E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>F:\WorkPlace\VS\ShabbyComponents\ShabbyThreadPool\Headers;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,9 +137,11 @@
   <ItemGroup>
     <ClInclude Include="Headers\EventsQueue.h" />
     <ClInclude Include="Headers\ShabbyThreadPool.h" />
+    <ClInclude Include="Headers\ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cpps\ShabbyThreadPool.cpp" />
+    <ClCompile Include="Cpps\ThreadPool.cpp" />
     <ClCompile Include="Cpps\thread_pool_test.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>F:\WorkPlace\VS\ShabbyComponents\ShabbyRedis\Headers;$(IncludePath)</IncludePath>
     <LibraryPath>F:\WorkPlace\VS\ShabbyComponents\ShabbyRedis\Libs;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
