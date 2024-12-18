@@ -2,19 +2,19 @@
 
 TraverseResult XmlParser::DeSerialize(std::string xml_path)
 {
-	XMLDocument xmlDocument;
-	XMLError error = xmlDocument.LoadFile(xml_path.c_str());
+    tinyxml2::XMLDocument xmlDocument;
+    tinyxml2::XMLError error = xmlDocument.LoadFile(xml_path.c_str());
 	TraverseResult traverse_result;
-	if (error == XML_SUCCESS)
+	if (error == tinyxml2::XML_SUCCESS)
 		traverse_result = TraversingXML(&xmlDocument);
 	return traverse_result;
 }
 
-bool XmlParser::Serialize(const std::string& xml_path, XMLDocument& doc)
+bool XmlParser::Serialize(const std::string& xml_path, tinyxml2::XMLDocument& doc)
 {
     // 尝试保存 XML 文档到指定路径
-    XMLError result = doc.SaveFile(xml_path.c_str());
-    if (result != XML_SUCCESS) {
+    tinyxml2::XMLError result = doc.SaveFile(xml_path.c_str());
+    if (result != tinyxml2::XML_SUCCESS) {
         std::cerr << "Failed to save XML file: " << xml_path << ", Error Code: " << result << std::endl;
         return false;
     }
@@ -24,7 +24,7 @@ bool XmlParser::Serialize(const std::string& xml_path, XMLDocument& doc)
 }
 
 
-TraverseResult XmlParser::TraversingXML(XMLNode* node)
+TraverseResult XmlParser::TraversingXML(tinyxml2::XMLNode* node)
 {
     TraverseResult traverse_result;
     std::stringstream json_stream;
@@ -34,10 +34,10 @@ TraverseResult XmlParser::TraversingXML(XMLNode* node)
 
     if (node->ToElement())
     {
-        auto element = dynamic_cast<XMLElement*>(node);
+        auto element = dynamic_cast<tinyxml2::XMLElement*>(node);
         json_stream << "{ \"" << element->Name() << "\" : [ ";
 
-        const XMLAttribute* attribute = element->FirstAttribute();
+        const tinyxml2::XMLAttribute* attribute = element->FirstAttribute();
         while (attribute != nullptr)
         {
             json_stream << "{ \"" << attribute->Name() << "\" : \"" << attribute->Value() << "\" }, ";
@@ -46,7 +46,7 @@ TraverseResult XmlParser::TraversingXML(XMLNode* node)
 
         if (node->ToText())
         {
-            auto text = dynamic_cast<XMLText*>(node);
+            auto text = dynamic_cast<tinyxml2::XMLText*>(node);
             json_stream << "{ \"_text_\" : \"" << text->Value() << "\" } ";
         }
 
@@ -68,7 +68,7 @@ TraverseResult XmlParser::TraversingXML(XMLNode* node)
 
     if (!node->NoChildren())
     {
-        XMLNode* child = node->FirstChild();
+        tinyxml2::XMLNode* child = node->FirstChild();
         while (child != nullptr)
         {
             TraverseResult child_result = TraversingXML(child);

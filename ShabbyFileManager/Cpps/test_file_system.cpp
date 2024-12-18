@@ -98,27 +98,27 @@ public:
         }
         return true;
     }
-    bool Depart(XMLDocument& doc, GraphModel& graph_model)
+    bool Depart(tinyxml2::XMLDocument& doc, GraphModel& graph_model)
     {
         try
         {
             // 创建根元素
-            XMLElement* root = doc.NewElement("model");
+            tinyxml2::XMLElement* root = doc.NewElement("model");
             root->SetAttribute("name", graph_model.model_name.c_str());
 
             // 遍历 automatas 并构造子元素
             for (const auto& automata_source : graph_model.automatas)
             {
-                XMLElement* automata = doc.NewElement("automata");
+                tinyxml2::XMLElement* automata = doc.NewElement("automata");
                 automata->SetAttribute("id", automata_source.id.c_str());
 
-                XMLElement* initStatus = doc.NewElement("init_status");
+                tinyxml2::XMLElement* initStatus = doc.NewElement("init_status");
                 initStatus->SetAttribute("param", automata_source.init_status.c_str());
 
-                XMLElement* transferFunction = doc.NewElement("transfer_function");
+                tinyxml2::XMLElement* transferFunction = doc.NewElement("transfer_function");
                 transferFunction->SetAttribute("func", automata_source.transfer_function.c_str());
 
-                XMLElement* terminateSet = doc.NewElement("terminate_set");
+                tinyxml2::XMLElement* terminateSet = doc.NewElement("terminate_set");
                 terminateSet->SetAttribute("set", automata_source.terminate_set.c_str());
 
                 automata->InsertFirstChild(initStatus);
