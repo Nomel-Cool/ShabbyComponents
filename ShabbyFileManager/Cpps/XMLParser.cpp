@@ -10,20 +10,19 @@ TraverseResult XmlParser::DeSerialize(std::string xml_path)
 	return traverse_result;
 }
 
-bool XmlParser::Serialize(std::string xml_path)
+bool XmlParser::Serialize(const std::string& xml_path, XMLDocument& doc)
 {
-    XMLDocument xmlDocument;
-    XMLNode* root = xmlDocument.NewElement("Root");
-    xmlDocument.InsertFirstChild(root);
+    // 尝试保存 XML 文档到指定路径
+    XMLError result = doc.SaveFile(xml_path.c_str());
+    if (result != XML_SUCCESS) {
+        std::cerr << "Failed to save XML file: " << xml_path << ", Error Code: " << result << std::endl;
+        return false;
+    }
 
-    XMLElement* element = xmlDocument.NewElement("Example");
-    element->SetAttribute("attribute", "value");
-    element->SetText("This is a test");
-    root->InsertEndChild(element);
-
-    XMLError error = xmlDocument.SaveFile(xml_path.c_str());
-    return error == XML_SUCCESS;
+    std::cout << "Successfully saved XML to: " << xml_path << std::endl;
+    return true;
 }
+
 
 TraverseResult XmlParser::TraversingXML(XMLNode* node)
 {

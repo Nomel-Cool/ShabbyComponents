@@ -17,7 +17,7 @@ class XmlParser
 public:
     TraverseResult DeSerialize(std::string xml_path);
 
-    bool Serialize(std::string xml_path);
+	bool Serialize(const std::string& xml_path, XMLDocument& doc);
 protected:
 	/// <summary>
 	/// 遍历时只关心xml文档中的 <tag attribute="value1">text</tag> 结构

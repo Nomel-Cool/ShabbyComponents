@@ -39,6 +39,34 @@ public:
             return false;
         }
     }
+
+    template<typename StructuringClass>
+    bool TransClass2Xml(StructuringClass& target_obj, const std::string& xml_path, const std::function<bool(XMLDocument&, StructuringClass&)>& Depart)
+    {
+        try {
+            // 创建一个空的 XML 文档
+            XMLDocument doc;
+
+            // 通过 Depart 回调函数填充 XML 文档
+            if (!Depart(doc, target_obj)) {
+                std::cerr << "Depart function failed to generate XML data." << std::endl;
+                return false;
+            }
+
+            // 调用 Serialize 保存到指定路径
+            if (!xml_parser.Serialize(xml_path, doc)) {
+                std::cerr << "Failed to serialize XML document to path: " << xml_path << std::endl;
+                return false;
+            }
+
+            return true;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Exception occurred during TransClass2Xml: " << e.what() << std::endl;
+            return false;
+        }
+    }
+
 private:
     XmlParser xml_parser;
     JsonParser json_parser;

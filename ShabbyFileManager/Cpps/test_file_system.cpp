@@ -98,6 +98,48 @@ public:
         }
         return true;
     }
+    bool Depart(XMLDocument& doc, GraphModel& graph_model)
+    {
+        try
+        {
+            // 创建根元素
+            XMLElement* root = doc.NewElement("model");
+            root->SetAttribute("name", graph_model.model_name.c_str());
+
+            // 遍历 automatas 并构造子元素
+            for (const auto& automata_source : graph_model.automatas)
+            {
+                XMLElement* automata = doc.NewElement("automata");
+                automata->SetAttribute("id", automata_source.id.c_str());
+
+                XMLElement* initStatus = doc.NewElement("init_status");
+                initStatus->SetAttribute("param", automata_source.init_status.c_str());
+
+                XMLElement* transferFunction = doc.NewElement("transfer_function");
+                transferFunction->SetAttribute("func", automata_source.transfer_function.c_str());
+
+                XMLElement* terminateSet = doc.NewElement("terminate_set");
+                terminateSet->SetAttribute("set", automata_source.terminate_set.c_str());
+
+                automata->InsertFirstChild(initStatus);
+                automata->InsertAfterChild(initStatus, transferFunction);
+                automata->InsertEndChild(terminateSet);
+
+                root->InsertEndChild(automata);
+            }
+
+            // **关键步骤：将根元素设置为文档的根元素**
+            doc.InsertFirstChild(root);
+
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << "Exception in Depart: " << e.what() << std::endl;
+            return false;
+        }
+        return true;
+    }
+
 
 private:
     enum class State {
@@ -120,13 +162,27 @@ int main()
     GraphModel gm;
     ForCallBack callback;
 
-    auto bound_func = std::bind(&ForCallBack::FillUp, &callback, std::placeholders::_1, std::placeholders::_2);
-    bool traverse_result = fm.TransXml2Class<GraphModel>("./Resources/segment_automata.xml", gm, bound_func);
+    //auto bound_func_fillup = std::bind(&ForCallBack::FillUp, &callback, std::placeholders::_1, std::placeholders::_2);
+    //bool traverse_result = fm.TransXml2Class<GraphModel>("./Resources/segment_automata.xml", gm, bound_func_fillup);
 
-    if (!traverse_result) {
-        std::cerr << "Failed to traverse XML to class." << std::endl;
+    //if (!traverse_result) {
+    //    std::cerr << "Failed to traverse XML to class." << std::endl;
+    //}
+
+    auto bound_func_depart = std::bind(&ForCallBack::Depart, &callback, std::placeholders::_1, std::placeholders::_2);
+    gm.model_name = "Fuck you";
+    SingleAutomata a1, a2;
+    a1.id = "1";
+    a1.init_status = "a1";
+    a2.id = "2";
+    a2.init_status = "a2";
+    gm.automatas.emplace_back(a1);
+    gm.automatas.emplace_back(a2);
+    bool depart_result = fm.TransClass2Xml<GraphModel>(gm, "./Resources/segment_automata.xml", bound_func_depart);
+
+    if (!depart_result) {
+        std::cerr << "Failed to depart Class to Xml." << std::endl;
     }
-    int i = 0;
     return 0;
 }
 
