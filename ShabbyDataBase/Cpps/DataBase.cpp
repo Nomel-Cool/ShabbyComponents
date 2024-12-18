@@ -8,8 +8,6 @@ MySQLDatabase& MySQLDatabase::GetInstance()
 
 void MySQLDatabase::Init(const std::string& host, const std::string& user, const std::string& password, const std::string& dbname)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
     m_host = host;
     m_user = user;
     m_password = password;
