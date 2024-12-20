@@ -83,6 +83,12 @@ bool MySQLDatabase::IsConnected()
     return m_conn && mysql_ping(m_conn) == 0;
 }
 
+MYSQL* MySQLDatabase::GetConnection()
+{
+    std::lock_guard<std::mutex> lock(m_mutex); // 确保线程安全
+    return m_conn;
+}
+
 void MySQLDatabase::ConnectWithRetry()
 {
     while (true)

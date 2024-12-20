@@ -33,6 +33,9 @@ public:
     // 检查是否连接
     bool IsConnected();
 
+    // 返回数据库句柄 
+    MYSQL* GetConnection();
+
 private:
     MySQLDatabase() : m_conn(nullptr), m_heartbeatActive(false) {}
     ~MySQLDatabase() { Disconnect(); }
