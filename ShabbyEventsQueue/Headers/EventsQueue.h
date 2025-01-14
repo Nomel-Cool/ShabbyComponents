@@ -26,7 +26,7 @@ public:
     /// <returns>¿ÕÎªtrue£¬·ñÔòfalse</returns>
     bool Empty() const
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(mutex_));
         return inner_queue.empty();
     }
 
