@@ -16,7 +16,7 @@ class TaskModelQueue
 {
 public:
     TaskModelQueue() = default;
-    ~TaskModelQueue() = default;
+    ~TaskModelQueue() { cond_.notify_all(); }
     TaskModelQueue(const TaskModelQueue& other) = delete;
     TaskModelQueue& operator=(const TaskModelQueue&) = delete;
 
@@ -26,7 +26,7 @@ public:
     /// <returns>ø’Œ™true£¨∑Ò‘Úfalse</returns>
     bool Empty() const
     {
-        std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(mutex_));
+        std::lock_guard<std::mutex> lock(mutex_);
         return inner_queue.empty();
     }
 
@@ -59,7 +59,7 @@ public:
 
 private:
     std::queue<std::unique_ptr<T>> inner_queue;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable cond_;
 };
 
