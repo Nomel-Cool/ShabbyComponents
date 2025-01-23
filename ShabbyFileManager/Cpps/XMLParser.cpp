@@ -24,7 +24,7 @@ std::vector<std::string> XMLTraverser::TraversingXML(IXMLNode& node)
     while (attribute != nullptr)
     {
         json_stream << "{ \"" << attribute->Name() << "\" : \"" << attribute->Value() << "\" }, ";
-        attribute = attribute->Next();
+        attribute = std::move(attribute->Next());
     }
 
     json_stream << "{ \"_text_\" : \"" << node.GetText() << "\" } ";

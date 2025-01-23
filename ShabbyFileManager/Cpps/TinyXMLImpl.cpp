@@ -62,7 +62,11 @@ std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::FirstChild()
 
 std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::NextSibling()
 {
-	return std::make_unique<TinyXMLNodeAdapter>(node->NextSibling());
+	auto next_sibling = node->NextSibling();
+	if (next_sibling != nullptr)
+		return std::make_unique<TinyXMLNodeAdapter>(next_sibling);
+	else
+		return nullptr;
 }
 
 std::unique_ptr<IXMLAttribute> TinyXMLNodeAdapter::FirstAttribute()
@@ -126,7 +130,11 @@ const char* TinyXMLAttributeAdapter::Value() const
 
 std::unique_ptr<IXMLAttribute> TinyXMLAttributeAdapter::Next() const
 {
-	return std::make_unique<TinyXMLAttributeAdapter>(attribute->Next());
+	auto next_attr = attribute->Next();
+	if(next_attr != nullptr)
+		return std::make_unique<TinyXMLAttributeAdapter>(next_attr);
+	return
+		nullptr;
 }
 
 TinyXMLTextAdapter::TinyXMLTextAdapter(const tinyxml2::XMLText* init_text)

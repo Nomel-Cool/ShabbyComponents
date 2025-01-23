@@ -160,12 +160,12 @@ int main()
     GraphModel gm;
     ForCallBack callback;
 
-    //auto bound_func_fillup = std::bind(&ForCallBack::FillUp, &callback, std::placeholders::_1, std::placeholders::_2);
-    //bool traverse_result = fm.TransXml2Class<GraphModel>("./Resources/segment_automata.xml", gm, bound_func_fillup);
+    auto bound_func_fillup = std::bind(&ForCallBack::FillUp, &callback, std::placeholders::_1, std::placeholders::_2);
+    bool traverse_result = fm.TransXml2Class<GraphModel>("./Resources/segment_automata.xml", gm, bound_func_fillup);
 
-    //if (!traverse_result) {
-    //    std::cerr << "Failed to traverse XML to class." << std::endl;
-    //}
+    if (!traverse_result) {
+        std::cerr << "Failed to traverse XML to class." << std::endl;
+    }
 
     auto bound_func_depart = std::bind(&ForCallBack::Depart, &callback, std::placeholders::_1, std::placeholders::_2);
     gm.model_name = "Hello you";
