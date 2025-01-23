@@ -39,6 +39,12 @@
     <ClInclude Include="Headers\dLL.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\IXMLStructure.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\TinyXMLImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cpps\test_file_system.cpp">
@@ -54,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Cpps\XMLParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Cpps\TinyXMLImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

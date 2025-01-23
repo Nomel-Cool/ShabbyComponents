@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -137,10 +137,12 @@
   <ItemGroup>
     <ClInclude Include="Headers\dLL.h" />
     <ClInclude Include="Headers\FileManager.h" />
+    <ClInclude Include="Headers\IXMLStructure.h" />
     <ClInclude Include="Headers\json.hpp" />
     <ClInclude Include="Headers\JSONParser.h" />
     <ClInclude Include="Headers\json_fwd.hpp" />
     <ClInclude Include="Headers\tinyxml2.h" />
+    <ClInclude Include="Headers\TinyXMLImpl.h" />
     <ClInclude Include="Headers\XMLParser.h" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +151,7 @@
     <ClCompile Include="Cpps\test_file_system.cpp" />
     <ClCompile Include="Cpps\tinyxml2.cpp" />
     <ClCompile Include="Cpps\XMLParser.cpp" />
+    <ClCompile Include="Cpps\TinyXMLImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="Resources\segment_automata.xml" />

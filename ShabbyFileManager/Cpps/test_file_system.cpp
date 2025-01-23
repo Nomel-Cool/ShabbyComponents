@@ -3,6 +3,7 @@
 #include "FileManager.h"
 #include "json.hpp"
 
+
 using json = nlohmann::json;
 
 class SingleAutomata {
@@ -98,39 +99,35 @@ public:
         }
         return true;
     }
-    bool Depart(tinyxml2::XMLDocument& doc, GraphModel& graph_model)
+    bool Depart(std::shared_ptr<IXMLDocument> doc, GraphModel& graph_model)
     {
         try
         {
             // 创建根元素
-            tinyxml2::XMLElement* root = doc.NewElement("model");
+            std::unique_ptr<IXMLNode> root = doc->NewRoot("model");
             root->SetAttribute("name", graph_model.model_name.c_str());
 
             // 遍历 automatas 并构造子元素
             for (const auto& automata_source : graph_model.automatas)
             {
-                tinyxml2::XMLElement* automata = doc.NewElement("automata");
+                std::unique_ptr<IXMLNode> automata = doc->NewNode("automata");
                 automata->SetAttribute("id", automata_source.id.c_str());
 
-                tinyxml2::XMLElement* initStatus = doc.NewElement("init_status");
+                std::unique_ptr<IXMLNode> initStatus = doc->NewNode("init_status");
                 initStatus->SetAttribute("param", automata_source.init_status.c_str());
 
-                tinyxml2::XMLElement* transferFunction = doc.NewElement("transfer_function");
+                std::unique_ptr<IXMLNode> transferFunction = doc->NewNode("transfer_function");
                 transferFunction->SetAttribute("func", automata_source.transfer_function.c_str());
 
-                tinyxml2::XMLElement* terminateSet = doc.NewElement("terminate_set");
+                std::unique_ptr<IXMLNode> terminateSet = doc->NewNode("terminate_set");
                 terminateSet->SetAttribute("set", automata_source.terminate_set.c_str());
 
-                automata->InsertFirstChild(initStatus);
-                automata->InsertAfterChild(initStatus, transferFunction);
-                automata->InsertEndChild(terminateSet);
+                initStatus = std::move(automata->InsertFirstChild(std::move(initStatus)));
+                automata->InsertAfterChild(std::move(initStatus), std::move(transferFunction));
+                automata->InsertEndChild(std::move(terminateSet));
 
-                root->InsertEndChild(automata);
+                root->InsertEndChild(std::move(automata));
             }
-
-            // **关键步骤：将根元素设置为文档的根元素**
-            doc.InsertFirstChild(root);
-
         }
         catch (std::exception& e)
         {
@@ -158,7 +155,8 @@ private:
 
 int main()
 {
-    FileManager fm;
+    std::unique_ptr<IXMLDocumentFactory> tinyxml_factory = std::make_unique<TinyXMLDocumentFactory>();
+    FileManager fm(std::move(tinyxml_factory));
     GraphModel gm;
     ForCallBack callback;
 
@@ -170,7 +168,7 @@ int main()
     //}
 
     auto bound_func_depart = std::bind(&ForCallBack::Depart, &callback, std::placeholders::_1, std::placeholders::_2);
-    gm.model_name = "Fuck you";
+    gm.model_name = "Hello you";
     SingleAutomata a1, a2;
     a1.id = "1";
     a1.init_status = "a1";

@@ -1,21 +1,11 @@
 #include "XMLParser.h"
 
-TraverseResult XmlParser::DeSerialize(std::string xml_path)
-{
-    tinyxml2::XMLDocument xmlDocument;
-    tinyxml2::XMLError error = xmlDocument.LoadFile(xml_path.c_str());
-	TraverseResult traverse_result;
-	if (error == tinyxml2::XML_SUCCESS)
-		traverse_result = TraversingXML(&xmlDocument);
-	return traverse_result;
-}
-
-bool XmlParser::Serialize(const std::string& xml_path, tinyxml2::XMLDocument& doc)
+bool XMLSerializer::Serialize(const std::string& xml_path, IXMLDocument& doc)
 {
     // 尝试保存 XML 文档到指定路径
-    tinyxml2::XMLError result = doc.SaveFile(xml_path.c_str());
-    if (result != tinyxml2::XML_SUCCESS) {
-        std::cerr << "Failed to save XML file: " << xml_path << ", Error Code: " << result << std::endl;
+    bool result = doc.SaveFile(xml_path.c_str());
+    if (!result) {
+        std::cerr << "Failed to save XML file: " << xml_path << std::endl;
         return false;
     }
 
@@ -23,59 +13,79 @@ bool XmlParser::Serialize(const std::string& xml_path, tinyxml2::XMLDocument& do
     return true;
 }
 
-
-TraverseResult XmlParser::TraversingXML(tinyxml2::XMLNode* node)
+std::vector<std::string> XMLTraverser::TraversingXML(IXMLNode& node)
 {
-    TraverseResult traverse_result;
+    std::vector<std::string> traverse_result;
     std::stringstream json_stream;
 
-    if (node == nullptr)
-        return traverse_result;
+    json_stream << "{ \"" << node.Name() << "\" : [ ";
 
-    if (node->ToElement())
+    std::unique_ptr<IXMLAttribute> attribute = node.FirstAttribute();
+    while (attribute != nullptr)
     {
-        auto element = dynamic_cast<tinyxml2::XMLElement*>(node);
-        json_stream << "{ \"" << element->Name() << "\" : [ ";
-
-        const tinyxml2::XMLAttribute* attribute = element->FirstAttribute();
-        while (attribute != nullptr)
-        {
-            json_stream << "{ \"" << attribute->Name() << "\" : \"" << attribute->Value() << "\" }, ";
-            attribute = attribute->Next();
-        }
-
-        if (node->ToText())
-        {
-            auto text = dynamic_cast<tinyxml2::XMLText*>(node);
-            json_stream << "{ \"_text_\" : \"" << text->Value() << "\" } ";
-        }
-
-        // Remove the trailing comma and space if they exist
-        std::string json_string = json_stream.str();
-        if (json_string.back() == ' ')
-        {
-            json_string.pop_back();
-            if (json_string.back() == ',')
-            {
-                json_string.pop_back();
-            }
-        }
-
-        json_string += " ] }";
-        traverse_result.push_back(json_string);
-        json_stream.str("");  // Clear the stringstream for the next element
+        json_stream << "{ \"" << attribute->Name() << "\" : \"" << attribute->Value() << "\" }, ";
+        attribute = attribute->Next();
     }
 
-    if (!node->NoChildren())
+    json_stream << "{ \"_text_\" : \"" << node.GetText() << "\" } ";
+
+    // Remove the trailing comma and space if they exist
+    std::string json_string = json_stream.str();
+    if (json_string.back() == ' ')
     {
-        tinyxml2::XMLNode* child = node->FirstChild();
+        json_string.pop_back();
+        if (json_string.back() == ',')
+        {
+            json_string.pop_back();
+        }
+    }
+
+    json_string += " ] }";
+    traverse_result.push_back(json_string);
+    json_stream.str("");  // Clear the stringstream for the next element
+
+    if (!node.NoChildren())
+    {
+        auto child = node.FirstChild();
         while (child != nullptr)
         {
-            TraverseResult child_result = TraversingXML(child);
+            std::vector<std::string> child_result = TraversingXML(*child);
             traverse_result.insert(traverse_result.end(), child_result.begin(), child_result.end());
             child = child->NextSibling();
         }
     }
 
     return traverse_result;
+}
+
+XMLDeserializer::XMLDeserializer(std::unique_ptr<IXMLDocumentFactory> factory)
+{
+    factory_ = std::move(factory);
+}
+
+std::unique_ptr<IXMLDocument> XMLDeserializer::DeSerialize(std::string xml_path)
+{
+    auto xmlDocument = factory_->CreateDocument();
+    bool result = xmlDocument->LoadFile(xml_path.c_str());
+    if (result)
+        return xmlDocument;
+    return nullptr;
+}
+
+XmlParser::XmlParser(std::unique_ptr<IXMLDocumentFactory> factory)
+{
+    up_xml_traverser = std::make_unique<XMLTraverser>();
+    up_xml_serializer = std::make_unique<XMLSerializer>();
+    up_xml_deserializer = std::make_unique<XMLDeserializer>(std::move(factory));
+}
+
+bool XmlParser::DoSerialization(const std::string& xml_path, IXMLDocument& doc)
+{
+    return up_xml_serializer->Serialize(xml_path, doc);
+}
+
+std::vector<std::string> XmlParser::DoDeserialization(const std::string& xml_path)
+{
+    auto abstract_node = up_xml_deserializer->DeSerialize(xml_path);
+    return up_xml_traverser->TraversingXML(*abstract_node->GetRoot());
 }
