@@ -110,16 +110,16 @@ public:
             // 遍历 automatas 并构造子元素
             for (const auto& automata_source : graph_model.automatas)
             {
-                std::unique_ptr<IXMLNode> automata = doc->NewNode("automata");
+                std::unique_ptr<IXMLNode> automata = root->NewNode(doc, "automata");
                 automata->SetAttribute("id", automata_source.id.c_str());
 
-                std::unique_ptr<IXMLNode> initStatus = doc->NewNode("init_status");
+                std::unique_ptr<IXMLNode> initStatus = root->NewNode(doc, "init_status");
                 initStatus->SetAttribute("param", automata_source.init_status.c_str());
 
-                std::unique_ptr<IXMLNode> transferFunction = doc->NewNode("transfer_function");
+                std::unique_ptr<IXMLNode> transferFunction = root->NewNode(doc, "transfer_function");
                 transferFunction->SetAttribute("func", automata_source.transfer_function.c_str());
 
-                std::unique_ptr<IXMLNode> terminateSet = doc->NewNode("terminate_set");
+                std::unique_ptr<IXMLNode> terminateSet = root->NewNode(doc, "terminate_set");
                 terminateSet->SetAttribute("set", automata_source.terminate_set.c_str());
 
                 initStatus = std::move(automata->InsertFirstChild(std::move(initStatus)));

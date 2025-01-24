@@ -35,11 +35,12 @@ public:
 	const char* Name() const override;
 	std::unique_ptr<IXMLNode> FirstChild() override;
 	std::unique_ptr<IXMLNode> NextSibling() override;
-	std::unique_ptr<IXMLAttribute> FirstAttribute() override;
 	std::unique_ptr<IXMLNode> InsertFirstChild(std::unique_ptr<IXMLNode> first_node) override;
 	std::unique_ptr<IXMLNode> InsertAfterChild(std::unique_ptr<IXMLNode> former_node, std::unique_ptr<IXMLNode> later_node) override;
 	void InsertEndChild(std::unique_ptr<IXMLNode> last_node) override;
+	std::unique_ptr<IXMLNode> NewNode(std::shared_ptr<IXMLDocument> doc, const char* node_name) override;
 	void SetAttribute(const char* key, const char* value) override;
+	std::unique_ptr<IXMLAttribute> FirstAttribute() override;
 	std::unique_ptr<IXMLText> GetText() override;
 	bool NoChildren() const override;
 private:
@@ -56,8 +57,8 @@ public:
 	bool LoadFile(const char* path) override;
 	bool SaveFile(const char* path) override;
 	std::unique_ptr<IXMLNode> NewRoot(const char* node_name) override;
-	std::unique_ptr<IXMLNode> NewNode(const char* node_name) override;
 	std::unique_ptr<IXMLNode> GetRoot() override;
+	tinyxml2::XMLDocument* GetDocHandler();
 private:
 	tinyxml2::XMLDocument* doc;
 };

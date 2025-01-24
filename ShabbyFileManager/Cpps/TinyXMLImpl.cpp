@@ -33,15 +33,14 @@ std::unique_ptr<IXMLNode> TinyXMLDocumentAdapter::NewRoot(const char* node_name)
 	return std::make_unique<TinyXMLNodeAdapter>(root);
 }
 
-std::unique_ptr<IXMLNode> TinyXMLDocumentAdapter::NewNode(const char* node_name)
-{
-	auto element_node = doc->NewElement(node_name);
-	return std::make_unique<TinyXMLNodeAdapter>(element_node);
-}
-
 std::unique_ptr<IXMLNode> TinyXMLDocumentAdapter::GetRoot()
 {
 	return std::make_unique<TinyXMLNodeAdapter>(doc->RootElement());
+}
+
+tinyxml2::XMLDocument* TinyXMLDocumentAdapter::GetDocHandler()
+{
+	return doc;
 }
 
 TinyXMLNodeAdapter::TinyXMLNodeAdapter(const tinyxml2::XMLNode* init_node)
@@ -94,6 +93,14 @@ void TinyXMLNodeAdapter::InsertEndChild(std::unique_ptr<IXMLNode> last_node)
 {
 	auto* adapter = dynamic_cast<TinyXMLNodeAdapter*>(last_node.get());
 	node->InsertEndChild(adapter->node);
+}
+
+std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::NewNode(std::shared_ptr<IXMLDocument> doc, const char* node_name)
+{
+	auto upcast_doc = dynamic_cast<TinyXMLDocumentAdapter*>(doc.get());
+	auto tinyxml_doc = upcast_doc->GetDocHandler();
+	auto element_node = tinyxml_doc->NewElement(node_name);
+	return std::make_unique<TinyXMLNodeAdapter>(element_node);
 }
 
 void TinyXMLNodeAdapter::SetAttribute(const char* key, const char* value)
