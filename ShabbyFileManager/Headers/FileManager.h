@@ -15,7 +15,7 @@ class  FileManager
 {
 public:
     FileManager() = default;
-    FileManager(std::unique_ptr<IXMLDocumentFactory> factory) 
+    FileManager(std::unique_ptr<shabby::IXMLDocumentFactory> factory) 
     { 
         xml_parser = std::make_unique<XmlParser>(std::move(factory));
     }
@@ -45,11 +45,11 @@ public:
     }
 
     template<typename StructuringClass>
-    bool TransClass2Xml(StructuringClass& target_obj, const std::string& xml_path, const std::function<bool(std::shared_ptr<IXMLDocument>, StructuringClass&)>& Depart)
+    bool TransClass2Xml(StructuringClass& target_obj, const std::string& xml_path, const std::function<bool(std::shared_ptr<shabby::IXMLDocument>, StructuringClass&)>& Depart)
     {
         try {
             // 创建一个空的 XML 文档
-            std::shared_ptr<IXMLDocument> doc = std::make_shared<TinyXMLDocumentAdapter>();
+            std::shared_ptr<shabby::IXMLDocument> doc = std::make_shared<TinyXMLDocumentAdapter>();
 
             // 通过 Depart 回调函数填充 XML 文档
             if (!Depart(doc, target_obj)) {

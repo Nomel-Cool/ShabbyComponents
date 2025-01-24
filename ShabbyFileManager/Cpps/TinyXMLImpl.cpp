@@ -26,14 +26,14 @@ bool TinyXMLDocumentAdapter::SaveFile(const char* path)
 	return doc->SaveFile(path) == tinyxml2::XML_SUCCESS;
 }
 
-std::unique_ptr<IXMLNode> TinyXMLDocumentAdapter::NewRoot(const char* node_name)
+std::unique_ptr<shabby::IXMLNode> TinyXMLDocumentAdapter::NewRoot(const char* node_name)
 {
 	auto root = doc->NewElement(node_name);
 	doc->InsertFirstChild(root);
 	return std::make_unique<TinyXMLNodeAdapter>(root);
 }
 
-std::unique_ptr<IXMLNode> TinyXMLDocumentAdapter::GetRoot()
+std::unique_ptr<shabby::IXMLNode> TinyXMLDocumentAdapter::GetRoot()
 {
 	return std::make_unique<TinyXMLNodeAdapter>(doc->RootElement());
 }
@@ -54,12 +54,12 @@ const char* TinyXMLNodeAdapter::Name() const
 	return element->Name();
 }
 
-std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::FirstChild()
+std::unique_ptr<shabby::IXMLNode> TinyXMLNodeAdapter::FirstChild()
 {
 	return std::make_unique<TinyXMLNodeAdapter>(node->FirstChild());
 }
 
-std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::NextSibling()
+std::unique_ptr<shabby::IXMLNode> TinyXMLNodeAdapter::NextSibling()
 {
 	auto next_sibling = node->NextSibling();
 	if (next_sibling != nullptr)
@@ -68,20 +68,20 @@ std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::NextSibling()
 		return nullptr;
 }
 
-std::unique_ptr<IXMLAttribute> TinyXMLNodeAdapter::FirstAttribute()
+std::unique_ptr<shabby::IXMLAttribute> TinyXMLNodeAdapter::FirstAttribute()
 {
 	auto element = dynamic_cast<tinyxml2::XMLElement*>(node);
 	return std::make_unique<TinyXMLAttributeAdapter>(element->FirstAttribute());
 }
 
-std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::InsertFirstChild(std::unique_ptr<IXMLNode> first_node)
+std::unique_ptr<shabby::IXMLNode> TinyXMLNodeAdapter::InsertFirstChild(std::unique_ptr<shabby::IXMLNode> first_node)
 {
 	auto* adapter = dynamic_cast<TinyXMLNodeAdapter*>(first_node.get());
 	node->InsertFirstChild(adapter->node);
 	return std::move(first_node);
 }
 
-std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::InsertAfterChild(std::unique_ptr<IXMLNode> former_node, std::unique_ptr<IXMLNode> later_node)
+std::unique_ptr<shabby::IXMLNode> TinyXMLNodeAdapter::InsertAfterChild(std::unique_ptr<shabby::IXMLNode> former_node, std::unique_ptr<shabby::IXMLNode> later_node)
 {
 	auto* adapter_lhs = dynamic_cast<TinyXMLNodeAdapter*>(former_node.get());
 	auto* adapter_rhs = dynamic_cast<TinyXMLNodeAdapter*>(later_node.get());
@@ -89,13 +89,13 @@ std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::InsertAfterChild(std::unique_ptr<I
 	return std::move(later_node);
 }
 
-void TinyXMLNodeAdapter::InsertEndChild(std::unique_ptr<IXMLNode> last_node)
+void TinyXMLNodeAdapter::InsertEndChild(std::unique_ptr<shabby::IXMLNode> last_node)
 {
 	auto* adapter = dynamic_cast<TinyXMLNodeAdapter*>(last_node.get());
 	node->InsertEndChild(adapter->node);
 }
 
-std::unique_ptr<IXMLNode> TinyXMLNodeAdapter::NewNode(std::shared_ptr<IXMLDocument> doc, const char* node_name)
+std::unique_ptr<shabby::IXMLNode> TinyXMLNodeAdapter::NewNode(std::shared_ptr<shabby::IXMLDocument> doc, const char* node_name)
 {
 	auto upcast_doc = dynamic_cast<TinyXMLDocumentAdapter*>(doc.get());
 	auto tinyxml_doc = upcast_doc->GetDocHandler();
@@ -109,7 +109,7 @@ void TinyXMLNodeAdapter::SetAttribute(const char* key, const char* value)
 	element->SetAttribute(key, value);
 }
 
-std::unique_ptr<IXMLText> TinyXMLNodeAdapter::GetText()
+std::unique_ptr<shabby::IXMLText> TinyXMLNodeAdapter::GetText()
 {
 	auto text = dynamic_cast<tinyxml2::XMLText*>(node);
 	return std::make_unique<TinyXMLTextAdapter>(text);
@@ -135,7 +135,7 @@ const char* TinyXMLAttributeAdapter::Value() const
 	return attribute->Value();
 }
 
-std::unique_ptr<IXMLAttribute> TinyXMLAttributeAdapter::Next() const
+std::unique_ptr<shabby::IXMLAttribute> TinyXMLAttributeAdapter::Next() const
 {
 	auto next_attr = attribute->Next();
 	if(next_attr != nullptr)
@@ -154,7 +154,7 @@ const char* TinyXMLTextAdapter::Value() const
 	return text->Value();
 }
 
-std::unique_ptr<IXMLDocument> TinyXMLDocumentFactory::CreateDocument()
+std::unique_ptr<shabby::IXMLDocument> TinyXMLDocumentFactory::CreateDocument()
 {
 	return std::make_unique<TinyXMLDocumentAdapter>();
 }

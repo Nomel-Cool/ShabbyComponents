@@ -1,6 +1,6 @@
 #include "XMLParser.h"
 
-bool XMLSerializer::Serialize(const std::string& xml_path, IXMLDocument& doc)
+bool XMLSerializer::Serialize(const std::string& xml_path, shabby::IXMLDocument& doc)
 {
     // 尝试保存 XML 文档到指定路径
     bool result = doc.SaveFile(xml_path.c_str());
@@ -13,14 +13,14 @@ bool XMLSerializer::Serialize(const std::string& xml_path, IXMLDocument& doc)
     return true;
 }
 
-std::vector<std::string> XMLTraverser::TraversingXML(IXMLNode& node)
+std::vector<std::string> XMLTraverser::TraversingXML(shabby::IXMLNode& node)
 {
     std::vector<std::string> traverse_result;
     std::stringstream json_stream;
 
     json_stream << "{ \"" << node.Name() << "\" : [ ";
 
-    std::unique_ptr<IXMLAttribute> attribute = node.FirstAttribute();
+    std::unique_ptr<shabby::IXMLAttribute> attribute = node.FirstAttribute();
     while (attribute != nullptr)
     {
         json_stream << "{ \"" << attribute->Name() << "\" : \"" << attribute->Value() << "\" }, ";
@@ -58,12 +58,12 @@ std::vector<std::string> XMLTraverser::TraversingXML(IXMLNode& node)
     return traverse_result;
 }
 
-XMLDeserializer::XMLDeserializer(std::unique_ptr<IXMLDocumentFactory> factory)
+XMLDeserializer::XMLDeserializer(std::unique_ptr<shabby::IXMLDocumentFactory> factory)
 {
     factory_ = std::move(factory);
 }
 
-std::unique_ptr<IXMLDocument> XMLDeserializer::DeSerialize(std::string xml_path)
+std::unique_ptr<shabby::IXMLDocument> XMLDeserializer::DeSerialize(std::string xml_path)
 {
     auto xmlDocument = factory_->CreateDocument();
     bool result = xmlDocument->LoadFile(xml_path.c_str());
@@ -72,14 +72,14 @@ std::unique_ptr<IXMLDocument> XMLDeserializer::DeSerialize(std::string xml_path)
     return nullptr;
 }
 
-XmlParser::XmlParser(std::unique_ptr<IXMLDocumentFactory> factory)
+XmlParser::XmlParser(std::unique_ptr<shabby::IXMLDocumentFactory> factory)
 {
     up_xml_traverser = std::make_unique<XMLTraverser>();
     up_xml_serializer = std::make_unique<XMLSerializer>();
     up_xml_deserializer = std::make_unique<XMLDeserializer>(std::move(factory));
 }
 
-bool XmlParser::DoSerialization(const std::string& xml_path, IXMLDocument& doc)
+bool XmlParser::DoSerialization(const std::string& xml_path, shabby::IXMLDocument& doc)
 {
     return up_xml_serializer->Serialize(xml_path, doc);
 }

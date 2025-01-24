@@ -17,7 +17,7 @@ public:
 	/// 用散列表保存等价的Json结构视图：{ "tag" : [ { "attribute" : value } ] }
 	/// </summary>
 	/// <param name="node">用于遍历XML文件的节点，模型是DOM，从唯一的根节点开始</param>
-	std::vector<std::string> TraversingXML(IXMLNode& node);
+	std::vector<std::string> TraversingXML(shabby::IXMLNode& node);
 };
 
 class XMLSerializer
@@ -29,28 +29,28 @@ public:
 	/// <param name="xml_path">文件目录</param>
 	/// <param name="doc">结构化的XML对象</param>
 	/// <returns>成功返回true，否则false</returns>
-	bool Serialize(const std::string& xml_path, IXMLDocument& doc);
+	bool Serialize(const std::string& xml_path, shabby::IXMLDocument& doc);
 };
 
 class XMLDeserializer
 {
 public:
-	XMLDeserializer(std::unique_ptr<IXMLDocumentFactory> factory);
+	XMLDeserializer(std::unique_ptr<shabby::IXMLDocumentFactory> factory);
 	/// <summary>
 	/// 加载给定的 XML 文件 URL
 	/// </summary>
 	/// <param name="xml_path"> xml 文件路径 </param>
 	/// <returns>成功则返回文件指针，否则空指针</returns>
-	std::unique_ptr<IXMLDocument> DeSerialize(std::string xml_path);
+	std::unique_ptr<shabby::IXMLDocument> DeSerialize(std::string xml_path);
 private:
-	std::unique_ptr<IXMLDocumentFactory> factory_;
+	std::unique_ptr<shabby::IXMLDocumentFactory> factory_;
 };
 
 class XmlParser
 {
 public:
-	XmlParser(std::unique_ptr<IXMLDocumentFactory> factory);
-	bool DoSerialization(const std::string& xml_path, IXMLDocument& doc);
+	XmlParser(std::unique_ptr<shabby::IXMLDocumentFactory> factory);
+	bool DoSerialization(const std::string& xml_path, shabby::IXMLDocument& doc);
 	std::vector<std::string> DoDeserialization(const std::string& xml_path);
 private:
 	std::unique_ptr<XMLTraverser> up_xml_traverser;
