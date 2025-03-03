@@ -1,4 +1,13 @@
 #pragma once
+
+#ifndef SHABBY_DATABASE_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef DATABASE_H
 #define DATABASE_H
 
@@ -12,7 +21,7 @@
 #include <thread>
 #include <atomic>
 
-class MySQLDatabase
+class SHABBY_CLASS MySQLDatabase
 {
 public:
     // 获取单例实例
