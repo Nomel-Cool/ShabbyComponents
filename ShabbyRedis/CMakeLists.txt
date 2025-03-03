@@ -16,6 +16,9 @@ file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/Cpps/*.cpp)
 # 添加库目标
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+# 定义导出宏
+target_compile_definitions(${PROJECT_NAME} PRIVATE SHABBY_DATABASE_EXPORTS)
+
 # 指定生成位置
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/x64
@@ -24,12 +27,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # 添加生成 .lib 文件的目标 
-add_library(${PROJECT_NAME}_static STATIC ${SOURCES}) 
-set_target_properties(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_static")
+#add_library(${PROJECT_NAME}_static STATIC ${SOURCES}) 
+#set_target_properties(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_static")
 
 # 添加 hiredis 库路径
 file(GLOB LIB_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Libs/*.lib")
 
 # 链接 hiredis 库
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIB_FILES})
-target_link_libraries(${PROJECT_NAME}_static PUBLIC ${LIB_FILES})
+#target_link_libraries(${PROJECT_NAME}_static PUBLIC ${LIB_FILES})
