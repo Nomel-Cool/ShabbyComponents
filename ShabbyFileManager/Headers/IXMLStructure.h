@@ -1,9 +1,18 @@
 #pragma once
+
+#ifndef SHABBY_FILE_MANAGER_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef I_XML_STRUCTURE_H
 #define I_XML_STRUCTURE_H
 namespace shabby
 {
-	class IXMLAttribute
+	class SHABBY_CLASS IXMLAttribute
 	{
 	public:
 		virtual ~IXMLAttribute() = default;
@@ -11,15 +20,15 @@ namespace shabby
 		virtual const char* Value() const = 0;
 		virtual std::unique_ptr<IXMLAttribute> Next() const = 0;
 	};
-	class IXMLText
+	class SHABBY_CLASS IXMLText
 	{
 	public:
 		virtual ~IXMLText() = default;
 		virtual const char* Value() const = 0;
 	};
 
-	class IXMLDocument;
-	class IXMLNode
+	class SHABBY_CLASS IXMLDocument;
+	class SHABBY_CLASS IXMLNode
 	{
 	public:
 		virtual ~IXMLNode() = default;
@@ -35,7 +44,7 @@ namespace shabby
 		virtual void SetAttribute(const char* key, const char* value) = 0;
 		virtual bool NoChildren() const = 0;
 	};
-	class IXMLDocument
+	class SHABBY_CLASS IXMLDocument
 	{
 	public:
 		virtual ~IXMLDocument() = default;
@@ -44,7 +53,7 @@ namespace shabby
 		virtual std::unique_ptr<IXMLNode> NewRoot(const char* node_name) = 0;
 		virtual std::unique_ptr<IXMLNode> GetRoot() = 0;
 	};
-	class IXMLDocumentFactory
+	class SHABBY_CLASS IXMLDocumentFactory
 	{
 	public:
 		virtual ~IXMLDocumentFactory() = default;

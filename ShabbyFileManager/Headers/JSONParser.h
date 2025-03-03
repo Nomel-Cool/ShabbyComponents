@@ -1,3 +1,13 @@
+#pragma once
+
+#ifndef SHABBY_FILE_MANAGER_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef JSON_PARSER_H
 #define JSON_PARSER_H
 
@@ -7,7 +17,7 @@
 
 using json = nlohmann::json;
 
-class JsonParser
+class SHABBY_CLASS JsonParser
 {
 public:
     virtual bool DeSerialize(std::string json_string, json& json_obj);

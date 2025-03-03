@@ -1,4 +1,13 @@
 #pragma once
+
+#ifndef SHABBY_FILE_MANAGER_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef TINYXML_IMPL_H
 #define TINYXML_IMPL_H
 
@@ -8,7 +17,7 @@
 
 #include "tinyxml2.h"
 
-class TinyXMLAttributeAdapter : public shabby::IXMLAttribute
+class SHABBY_CLASS TinyXMLAttributeAdapter : public shabby::IXMLAttribute
 {
 public:
 	TinyXMLAttributeAdapter(const tinyxml2::XMLAttribute* init_attribute);
@@ -19,7 +28,7 @@ private:
 	tinyxml2::XMLAttribute* attribute;
 };
 
-class TinyXMLTextAdapter : public shabby::IXMLText
+class SHABBY_CLASS TinyXMLTextAdapter : public shabby::IXMLText
 {
 public:
 	TinyXMLTextAdapter(const tinyxml2::XMLText* init_text);
@@ -28,7 +37,7 @@ private:
 	tinyxml2::XMLText* text;
 };
 
-class TinyXMLNodeAdapter : public shabby::IXMLNode
+class SHABBY_CLASS TinyXMLNodeAdapter : public shabby::IXMLNode
 {
 public:
 	TinyXMLNodeAdapter(const tinyxml2::XMLNode* init_node);
@@ -48,7 +57,7 @@ private:
 };
 
 
-class TinyXMLDocumentAdapter : public shabby::IXMLDocument
+class SHABBY_CLASS TinyXMLDocumentAdapter : public shabby::IXMLDocument
 {
 public:
 	TinyXMLDocumentAdapter();
@@ -62,7 +71,8 @@ public:
 private:
 	tinyxml2::XMLDocument* doc;
 };
-class TinyXMLDocumentFactory : public shabby::IXMLDocumentFactory 
+
+class SHABBY_CLASS TinyXMLDocumentFactory : public shabby::IXMLDocumentFactory 
 {
 public:
 	std::unique_ptr<shabby::IXMLDocument> CreateDocument() override;

@@ -1,3 +1,13 @@
+#pragma once
+
+#ifndef SHABBY_FILE_MANAGER_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef XML_PARSER_H
 #define XML_PARSER_H
 
@@ -9,7 +19,7 @@
 
 #include "TinyXMLImpl.h"
 
-class XMLTraverser
+class SHABBY_CLASS XMLTraverser
 {
 public:
 	/// <summary>
@@ -20,7 +30,7 @@ public:
 	std::vector<std::string> TraversingXML(shabby::IXMLNode& node);
 };
 
-class XMLSerializer
+class SHABBY_CLASS XMLSerializer
 {
 public:
 	/// <summary>
@@ -32,7 +42,7 @@ public:
 	bool Serialize(const std::string& xml_path, shabby::IXMLDocument& doc);
 };
 
-class XMLDeserializer
+class SHABBY_CLASS XMLDeserializer
 {
 public:
 	XMLDeserializer(std::unique_ptr<shabby::IXMLDocumentFactory> factory);
@@ -46,7 +56,7 @@ private:
 	std::unique_ptr<shabby::IXMLDocumentFactory> factory_;
 };
 
-class XmlParser
+class SHABBY_CLASS  XmlParser
 {
 public:
 	XmlParser(std::unique_ptr<shabby::IXMLDocumentFactory> factory);

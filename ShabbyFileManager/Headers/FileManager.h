@@ -1,5 +1,13 @@
 #pragma once
 
+#ifndef SHABBY_FILE_MANAGER_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
@@ -11,7 +19,7 @@
 #include "XMLParser.h"
 #include "JSONParser.h"
 
-class  FileManager
+class  SHABBY_CLASS FileManager
 {
 public:
     FileManager() = default;
