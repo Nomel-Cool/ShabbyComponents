@@ -87,5 +87,7 @@ bool XmlParser::DoSerialization(const std::string& xml_path, shabby::IXMLDocumen
 std::vector<std::string> XmlParser::DoDeserialization(const std::string& xml_path)
 {
     auto abstract_node = up_xml_deserializer->DeSerialize(xml_path);
+    if (abstract_node == nullptr)
+        return std::vector<std::string>();
     return up_xml_traverser->TraversingXML(*abstract_node->GetRoot());
 }
