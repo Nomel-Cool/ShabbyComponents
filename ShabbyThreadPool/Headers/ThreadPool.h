@@ -1,4 +1,13 @@
 #pragma once
+
+#ifndef SHABBY_THREAD_POOL_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #include <vector>
 #include <thread>
 #include <atomic>
@@ -7,7 +16,7 @@
 
 #include "EventsQueue.h"
 
-class ShabbyThreadPool {
+class SHABBY_CLASS ShabbyThreadPool {
 public:
     // 获取单例实例
     static ShabbyThreadPool& GetInstance();

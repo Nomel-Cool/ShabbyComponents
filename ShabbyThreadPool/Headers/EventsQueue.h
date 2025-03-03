@@ -1,4 +1,13 @@
 #pragma once
+
+#ifndef SHABBY_THREAD_POOL_EXPORTS
+#define SHABBY_CLASS __declspec(dllimport)
+#define SHABBY_TEMPLATE
+#else //EXPORT
+#define SHABBY_CLASS __declspec(dllexport)
+#define SHABBY_TEMPLATE __declspec(dllexport)
+#endif
+
 #ifndef EVENT_QUEUE_H
 #define EVENT_QUEUE_H
 
@@ -12,7 +21,7 @@
 /// 一对多的线程安全队列
 /// </summary>
 template<typename T>
-class TaskModelQueue {
+class SHABBY_TEMPLATE TaskModelQueue {
 public:
     TaskModelQueue() = default;
     ~TaskModelQueue() = default;
