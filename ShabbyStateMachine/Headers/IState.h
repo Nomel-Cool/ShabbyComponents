@@ -14,7 +14,10 @@ public:
 	virtual void Execute() = 0;
 	virtual void Suspend() = 0;
 	virtual void RestoredFrom(std::shared_ptr<IState> src_state) = 0;
-	virtual bool Transfer(std::shared_ptr<IState> src_state) = 0;
+	virtual bool Transfer(std::shared_ptr<IState> dest_state) = 0;
+	virtual void TransferAsync(std::shared_ptr<IState> dest_state, TransitionCondition condition) = 0;
+	virtual void PushHistory(std::shared_ptr<IState> state) = 0;
+	virtual std::shared_ptr<IState> PopHistory() = 0;
 	virtual std::string GetStatus() const = 0;
 };
 
