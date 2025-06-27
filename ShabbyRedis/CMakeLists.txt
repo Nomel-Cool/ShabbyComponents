@@ -17,7 +17,7 @@ file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/Cpps/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # 定义导出宏
-target_compile_definitions(${PROJECT_NAME} PRIVATE SHABBY_DATABASE_EXPORTS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SHABBY_REDIS_CLIENT_EXPORTS)
 
 # 指定生成位置
 set_target_properties(${PROJECT_NAME} PROPERTIES
