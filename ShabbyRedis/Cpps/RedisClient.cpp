@@ -2,7 +2,7 @@
 
 RedisClient::RedisClient()
 {
-	context = redisConnect("127.0.0.1", 6379);
+    context = redisConnect("127.0.0.1", 6379);
     if (context == nullptr || context->err) {
         if (context) {
             std::cerr << "Connection error: " << context->errstr << std::endl;
@@ -36,7 +36,7 @@ RedisClient::~RedisClient()
         redisFree(context);
 }
 
-void RedisClient::SelectDB(int dbIndex) 
+void RedisClient::SelectDB(int dbIndex)
 {
     redisReply* reply = static_cast<redisReply*>(redisCommand(context, "SELECT %d", dbIndex));
     if (reply == nullptr || reply->type == REDIS_REPLY_ERROR) {
@@ -57,6 +57,19 @@ std::string RedisClient::Get(const std::string& key)
     return value;
 }
 
+bool RedisClient::GetBinary(const std::string& key, std::vector<uint8_t>& output)
+{
+    redisReply* reply = static_cast<redisReply*>(redisCommand(context, "GET %s", key.c_str()));
+    if (!reply || reply->type != REDIS_REPLY_STRING) {
+        freeReplyObject(reply);
+        return false;
+    }
+    output.assign(reinterpret_cast<const uint8_t*>(reply->str),
+        reinterpret_cast<const uint8_t*>(reply->str) + reply->len);
+    freeReplyObject(reply);
+    return true;
+}
+
 void RedisClient::Set(const std::string& key, const std::string& value)
 {
     redisReply* reply = static_cast<redisReply*>(redisCommand(context, "SET %s %s", key.c_str(), value.c_str()));
@@ -66,7 +79,16 @@ void RedisClient::Set(const std::string& key, const std::string& value)
     freeReplyObject(reply);
 }
 
-void RedisClient::Del(const std::string& key) 
+void RedisClient::SetEx(const std::string& key, const std::string& value, int expire_ms)
+{
+    redisReply* reply = static_cast<redisReply*>(redisCommand(context, "SET %s %s PX %d", key.c_str(), value.c_str(), expire_ms));
+    if (reply == nullptr) {
+        std::cerr << "SET command failed" << std::endl;
+    }
+    freeReplyObject(reply);
+}
+
+void RedisClient::Del(const std::string& key)
 {
     redisReply* reply = static_cast<redisReply*>(redisCommand(context, "DEL %s", key.c_str()));
     if (reply == nullptr) {
