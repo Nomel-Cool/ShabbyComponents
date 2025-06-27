@@ -1,4 +1,6 @@
 #pragma once
+#ifndef REDIS_CLIENT_H
+#define REDIS_CLIENT_H
 
 #include <iostream>
 #include <string>
@@ -67,3 +69,5 @@ public:
 private:
     redisContext* context;
 };
+
+#endif // REDIS_CLIENT_H
